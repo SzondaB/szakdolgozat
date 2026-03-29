@@ -1,0 +1,73 @@
+--- RUN RESULT ---
+seed: 277 bob_final_acc: 0.925293
+eve_final_acc: 0.676147
+bob_wrong_key_acc: 0.639526
+naive_cipher_acc: 0.500244
+bob_final_hard_err: 2.390625
+eve_final_hard_err: 10.363281
+mask_mean_final: 0.816182
+
+=== LAST RUN INFO ===
+MESSAGE: [[0 1 0 1 1 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 1 0 0 1 0 1 1 0 0 0 1 0]]
+KEY: [[1 0 0 0 0 0 1 0 0 1 0 1 1 0 1 0 0 1 1 1 0 0 1 0 1 1 0 1 0 1 1 1]]
+MASK: [[0.7339587 0.7367236 0.8912898 0.6808 0.94290805 0.8290494 0.92849654
+0.9287982 0.8275877 0.8978305 0.8320016 0.74393576 0.8828284 0.8583335
+0.7089162 0.8884496 0.8736267 0.8920068 0.8619989 0.70308566 0.90463644
+0.68760496 0.7157614 0.79216385 0.8734623 0.84093064 0.89932513 0.75903714
+0.7914943 0.8675389 0.6283192 0.8705991 ]]
+
+MASK>0.5: [[1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]]
+CIPHER RAW: [[ 0.4447089 0.13543253 0.6785482 -0.17721042 -0.19132221
+0.7043265 0.6526598 0.6422917 0.6609191 0.71935 -0.49501228 -0.36053097
+0.03328596 0.5933403 -0.18291251 -0.11178078 -0.76561785 0.7893286
+-0.6827901 -0.52605027 -0.6874618 0.01419519 0.18606983 -0.3812793
+0.73478097 0.6002809 0.6772222 0.2821613 -0.29803324 -0.6555101 0.28482297 0.75339323]]
+
+CIPHER SIGN: [[1 1 1 0 0 1 1 1 1 1 0 0 1 1 0 0 0 1 0 0 0 1 1 0 1 1 1 1 0 0 1 1]]
+BOB OUT: [[0 1 0 0 1 1 1 1 0 1 1 0 0 0 1 1 0 1 1 0 1 0 0 1 0 0 1 0 0 0 1 0]]
+EVE OUT: [[1 0 0 0 1 1 1 1 0 0 0 0 0 1 0 1 0 0 1 0 1 1 0 0 0 0 1 0 0 0 1 1]]
+
+=== MULTI-SEED SUMMARY ===
+bob_final_acc: 0.936880 ± 0.016170
+eve_final_acc: 0.672090 ± 0.008535
+bob_wrong_key_final_acc: 0.644531 ± 0.009288
+naive_cipher_final_acc: 0.500342 ± 0.005717
+bob_final_hard_err: 2.019844 ± 0.517426
+eve_final_hard_err: 10.493125 ± 0.273134
+mask_mean_final: 0.756742 ± 0.024519
+
+=== PER-SEED RESULTS ===
+seed=11 | Bob=0.9332 | Eve=0.6765 | WrongKey=0.6339 | Naive=0.4998 | Mask=0.7995
+seed=22 | Bob=0.9257 | Eve=0.6625 | WrongKey=0.6360 | Naive=0.5026 | Mask=0.7327
+seed=33 | Bob=0.9425 | Eve=0.6832 | WrongKey=0.6559 | Naive=0.5057 | Mask=0.7682
+seed=44 | Bob=0.9259 | Eve=0.6696 | WrongKey=0.6512 | Naive=0.5063 | Mask=0.7912
+seed=55 | Bob=0.9196 | Eve=0.6705 | WrongKey=0.6385 | Naive=0.5016 | Mask=0.7300
+seed=66 | Bob=0.9722 | Eve=0.6683 | WrongKey=0.6406 | Naive=0.4995 | Mask=0.7193
+seed=77 | Bob=0.9323 | Eve=0.6787 | WrongKey=0.6532 | Naive=0.5055 | Mask=0.7831
+seed=88 | Bob=0.9425 | Eve=0.6624 | WrongKey=0.6313 | Naive=0.5054 | Mask=0.7669
+seed=99 | Bob=0.9391 | Eve=0.6704 | WrongKey=0.6498 | Naive=0.5018 | Mask=0.7475
+seed=111 | Bob=0.9357 | Eve=0.6846 | WrongKey=0.6494 | Naive=0.5044 | Mask=0.7367
+seed=122 | Bob=0.9352 | Eve=0.6793 | WrongKey=0.6353 | Naive=0.5026 | Mask=0.7686
+seed=133 | Bob=0.9170 | Eve=0.6650 | WrongKey=0.6432 | Naive=0.4944 | Mask=0.7637
+seed=144 | Bob=0.9443 | Eve=0.6738 | WrongKey=0.6379 | Naive=0.4990 | Mask=0.7871
+seed=155 | Bob=0.9352 | Eve=0.6683 | WrongKey=0.6394 | Naive=0.4949 | Mask=0.7476
+seed=166 | Bob=0.9484 | Eve=0.6733 | WrongKey=0.6608 | Naive=0.4934 | Mask=0.7576
+seed=177 | Bob=0.9382 | Eve=0.6866 | WrongKey=0.6586 | Naive=0.5011 | Mask=0.7631
+seed=188 | Bob=0.9330 | Eve=0.6632 | WrongKey=0.6455 | Naive=0.5031 | Mask=0.7424
+seed=199 | Bob=0.9706 | Eve=0.6881 | WrongKey=0.6517 | Naive=0.4900 | Mask=0.7249
+seed=211 | Bob=0.9188 | Eve=0.6520 | WrongKey=0.6456 | Naive=0.4952 | Mask=0.7718
+seed=222 | Bob=0.9536 | Eve=0.6683 | WrongKey=0.6615 | Naive=0.5052 | Mask=0.7392
+seed=233 | Bob=0.9581 | Eve=0.6628 | WrongKey=0.6522 | Naive=0.5094 | Mask=0.7260
+seed=244 | Bob=0.9199 | Eve=0.6708 | WrongKey=0.6378 | Naive=0.4830 | Mask=0.7425
+seed=255 | Bob=0.9028 | Eve=0.6680 | WrongKey=0.6272 | Naive=0.5022 | Mask=0.7433
+seed=266 | Bob=0.9530 | Eve=0.6797 | WrongKey=0.6371 | Naive=0.5022 | Mask=0.7495
+seed=277 | Bob=0.9253 | Eve=0.6761 | WrongKey=0.6395 | Naive=0.5002 | Mask=0.8162
+
+=== DISTRIBUTION SUMMARY ===
+[bob_final_acc] mean: 0.936880 std: 0.016170 min: 0.902832 q25: 0.925659 median: 0.935181 q75: 0.944336 max: 0.972168
+[eve_final_acc] mean: 0.672090 std: 0.008535 min: 0.651978 q25: 0.667969 median: 0.670532 q75: 0.678711 max: 0.688110
+[bob_wrong_key_final_acc] mean: 0.644531 std: 0.009288 min: 0.627197 q25: 0.637817 median: 0.643188 q75: 0.651733 max: 0.661499
+[naive_cipher_final_acc] mean: 0.500342 std: 0.005717 min: 0.483032 q25: 0.499023 median: 0.501831 q75: 0.504395 max: 0.509399
+[bob_final_hard_err] mean: 2.019844 std: 0.517426 min: 0.890625 q25: 1.781250 median: 2.074219 q75: 2.378906 max: 3.109375
+[eve_final_hard_err] mean: 10.493125 std: 0.273134 min: 9.980469 q25: 10.281250 median: 10.542969 q75: 10.625000 max: 11.136719
+[mask_mean_final] mean: 0.756742 std: 0.024519 min: 0.719348 q25: 0.739239 median: 0.749533 q75: 0.768553 max: 0.816182
