@@ -1,6 +1,4 @@
 # szakdolgozat
-Versengő neurális hálózatok biztonsági rendszerekben történő alkalmazhatóságának vizsgálata
-
 Ez a program egy Alice-Bob-Eve típusú neurális kommunikációs modellt valósít meg.
 
 Alice egy bináris üzenet és egy kulcs alapján titkosított reprezentációt állít elő.
