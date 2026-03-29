@@ -17,10 +17,10 @@ A tréning három elkülönített részből áll:
 3. Alice tanítása olyan reprezentáció előállítására, amely Bob számára jól dekódolható,
    Eve számára viszont nehezebben értelmezhető.
 
-A modell opcionálisan tartalmaz:
-- Eve-loss komponenst,
-- mask regularizációt,
-- ramp/warmup mechanizmust Eve fokozatos bevezetésére.
+A modell tartalmaz 3 darab opcionálisan kikapcsolható komponenst is:
+- Eve-loss komponens,
+- mask regularizáció,
+- ramp/warmup mechanizmus Eve fokozatos bevezetésére.
 
-A program több seed melletti futtatást támogat, és a végén statisztikai összesítést,
+A program első sorban több seed melletti futtatást támogat, és a végén statisztikai összesítést,
 eloszlásvizsgálatot, valamint grafikus megjelenítést készít az eredményekről.
