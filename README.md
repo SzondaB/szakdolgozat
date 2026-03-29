@@ -17,7 +17,7 @@ A tréning három elkülönített részből áll:
 3. Alice tanítása olyan reprezentáció előállítására, amely Bob számára jól dekódolható,
    Eve számára viszont nehezebben értelmezhető.
 
-A modell tartalmaz 3 darab opcionálisan kikapcsolható komponenst is:
+A modell tartalmaz 3 darab opcionálisan kikapcsolható komponenst is, melyek az Alice-loss kiszámításában játszanak szerepet:
 - Eve-loss komponens,
 - mask regularizáció,
 - ramp/warmup mechanizmus Eve fokozatos bevezetésére.
