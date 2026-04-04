@@ -1,0 +1,1250 @@
+'''
+Ez a program egy Alice-Bob-Eve típusú neurális kommunikációs modellt valósít meg.
+
+Alice egy bináris üzenet és egy kulcs alapján titkosított reprezentációt állít elő.
+Bob a titkosított reprezentáció és a helyes kulcs segítségével próbálja rekonstruálni az üzenetet,
+míg Eve ugyanezt a feladatot végzi kulcs nélkül.
+
+A modell elsődleges célja annak vizsgálata, hogy a neurális hálózatok mennyire képesek
+alkalmazkodni ismeretlen és változó jelsorozatokhoz, illetve hogy a dekódoló hálózat
+mennyire marad működőképes a jelstruktúra változásai mellett.
+
+A tréning három elkülönített részből áll:
+1. Eve tanítása a cipherből történő kulcs nélküli visszafejtésre,
+2. Bob tanítása a cipher és a helyes kulcs alapján történő dekódolásra,
+3. Alice tanítása olyan reprezentáció előállítására, amely Bob számára jól dekódolható,
+   Eve számára viszont nehezebben értelmezhető.
+
+A modell tartalmaz 3 darab opcionálisan kikapcsolható komponenst is, melyek az Alice-loss kiszámításában játszanak szerepet:
+- Eve-loss komponens,
+- mask regularizáció,
+- ramp/warmup mechanizmus Eve fokozatos bevezetésére.
+
+A program több seed melletti futtatást támogat, és minden seed végén több frissen inicializált,
+véletlenszerű rejtett architektúrájú Eve modellt tanít a lefagyasztott Alice-Bob pár ellen.
+A végén statisztikai összesítést, eloszlásvizsgálatot, valamint grafikus megjelenítést készít az eredményekről.
+'''
+
+# ============================================================
+# IMPORTOK
+# ============================================================
+
+import random
+import csv
+import ast
+import torch
+import torch.nn as nn
+import numpy as np
+import torch.optim as optim
+import matplotlib.pyplot as plt
+
+# ============================================================
+# KONFIG
+# ============================================================
+
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+MSG_BITS = 32   # az üzenet hosszúsága
+KEY_BITS = 32   # a kulcs hosszúsága
+
+LAMBDA_EVE = 1.0    # mérőszám, Alice Eve randomizálására való törekvéséhez
+LAMBDA_MASK = 0.1   # Alice loss-jára mekkora hatással legyen a maszk
+MASK_TARGET = 0.5   # átlagosan mennyire használja Alice az encoding branch-et
+
+# attribútumok különböző tesztekhez
+USE_EVE_LOSS = True
+USE_MASK_LOSS = True
+USE_RAMP = True
+
+# globális iteráción belüli frissülések számának meghatározása
+ALICE_STEPS_PER_ITER = 1
+BOB_STEPS_PER_ITER = 2
+
+# ============================================================
+# FRESH EVE EVALUATION KONFIG
+# ============================================================
+
+NUM_FRESH_EVES = 20
+FRESH_EVE_ITERS = 20_000
+FRESH_EVE_LR = 1e-4
+FRESH_EVE_BATCH_SIZE = 256
+FRESH_EVE_EVAL_EVERY = 500
+FRESH_EVE_PRINT_EVERY = 5000
+
+# Random architektúra korlátok a rejtett rétegekre
+FRESH_EVE_MIN_HIDDEN_LAYERS = 1
+FRESH_EVE_MAX_HIDDEN_LAYERS = 7
+
+FRESH_EVE_MIN_WIDTH = 32
+FRESH_EVE_MAX_WIDTH = 768
+
+# Fix ellenőrző készlet mérete a fagyasztott Alice-Bob kiértékeléshez
+FRESH_FIXED_EVAL_SAMPLES = 4096
+
+# ============================================================
+# ADATGENERÁLÁS
+# ============================================================
+
+def generate_batch(batch_size=128, device=DEVICE):
+    msg = torch.randint(0, 2, (batch_size, MSG_BITS), device=device).float()
+    key = torch.randint(0, 2, (batch_size, KEY_BITS), device=device).float()
+    return msg, key
+
+
+@torch.no_grad()
+def build_fixed_eval_set(n_samples=4096, device=DEVICE):
+    msg, key = generate_batch(batch_size=n_samples, device=device)
+    return msg, key
+
+
+# ============================================================
+# MODELLEK (ALICE, BOB, EVE)
+# ============================================================
+
+class Alice(nn.Module):
+    '''
+    Alice
+    Bemenet: random generált üzenet és kulcs
+    Kimenet: egy kódolt reprezentáció és egy maszk
+    '''
+    def __init__(self):
+        super().__init__()
+        self.backbone = nn.Sequential(
+            nn.Linear(MSG_BITS + KEY_BITS, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+        )
+        self.enc_head = nn.Linear(128, MSG_BITS)
+        self.mask_head = nn.Linear(128, MSG_BITS)
+
+    def forward(self, msg, key):
+        x = torch.cat([msg, key], dim=1)
+        h = self.backbone(x)
+        enc_logits = self.enc_head(h)
+        mask_logits = self.mask_head(h)
+        return enc_logits, mask_logits
+
+
+class Bob(nn.Module):
+    '''
+    Bob
+    Bemenet: titkosított üzenet és kulcs
+    Kimenet: az eredeti üzenet becsült bitje (csak logitok)
+    '''
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(MSG_BITS + KEY_BITS, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, MSG_BITS)
+        )
+
+    def forward(self, cipher, key):
+        x = torch.cat([cipher, key], dim=1)
+        return self.net(x)
+
+
+class Eve(nn.Module):
+    '''
+    Eve
+    Bemenet: csak a titkosított üzenet
+    Kimenet: az eredeti üzenet becsült bitje (csak logitok)
+    '''
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(MSG_BITS, 64),
+            nn.ReLU(),
+            nn.Linear(64, 128),
+            nn.ReLU(),
+            nn.Linear(128, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, MSG_BITS)
+        )
+
+    def forward(self, cipher):
+        return self.net(cipher)
+
+
+class RandomEve(nn.Module):
+    '''
+    Fresh Eve modell.
+    Az input és output dimenzió fix:
+    - bemenet: 32 bites cipher
+    - kimenet: 32 bites logit
+    A randomizáció csak a rejtett rétegek számára és méretére vonatkozik.
+    '''
+    def __init__(self, hidden_sizes):
+        super().__init__()
+
+        layers = []
+        in_dim = MSG_BITS
+
+        for h in hidden_sizes:
+            layers.append(nn.Linear(in_dim, h))
+            layers.append(nn.ReLU())
+            in_dim = h
+
+        layers.append(nn.Linear(in_dim, MSG_BITS))
+        self.net = nn.Sequential(*layers)
+
+    def forward(self, cipher):
+        return self.net(cipher)
+
+
+# ============================================================
+# SEGÉDLETEK
+# ============================================================
+
+def build_random_eve_architecture(rng: random.Random):
+    '''
+    Seedelt random generátorral létrehoz egy véletlen Eve architektúrát.
+    Csak a rejtett rétegek száma és szélessége változik.
+    '''
+    num_hidden_layers = rng.randint(
+        FRESH_EVE_MIN_HIDDEN_LAYERS,
+        FRESH_EVE_MAX_HIDDEN_LAYERS
+    )
+
+    hidden_sizes = [
+        rng.randint(FRESH_EVE_MIN_WIDTH, FRESH_EVE_MAX_WIDTH)
+        for _ in range(num_hidden_layers)
+    ]
+
+    return hidden_sizes
+
+
+def format_eve_architecture(hidden_sizes):
+    '''
+    A rejtett réteglista alapján teljes architektúra-sztringet készít.
+    Példa: [128, 256, 64] --> '32 -> 128 -> 256 -> 64 -> 32'
+    '''
+    if isinstance(hidden_sizes, str):
+        hidden_sizes = ast.literal_eval(hidden_sizes)
+
+    dims = [MSG_BITS] + list(hidden_sizes) + [MSG_BITS]
+    return " -> ".join(str(x) for x in dims)
+
+
+def freeze_model(model):
+    model.eval()
+    set_requires_grad(model, False)
+
+'''
+Bináris keresztentrópia veszteségfüggvény, ami bináris célértékek esetén méri a modell hibáját
+Logitokat használ valós bitek mellett, a sigmoidot automatikusan tartalmazza
+'''
+bce = nn.BCEWithLogitsLoss()
+
+
+'''
+A több seed-en futtatott kísérletek eredményeiből számol leíró statisztikákat (átlag, szórás, kvartilis, szélsőérték)
+'''
+def descriptive_stats(values):
+    arr = np.array(values, dtype=np.float64)
+    return {
+        "mean": arr.mean(),
+        "std": arr.std(),
+        "min": arr.min(),
+        "q25": np.percentile(arr, 25),
+        "median": np.median(arr),
+        "q75": np.percentile(arr, 75),
+        "max": arr.max(),
+    }
+
+
+'''
+A multi-seed futtatások eredményeit egy csv kiterjesztésű fájlba menti
+'''
+def save_multi_seed_results(results, filename="multi_seed_results.csv"):
+    if not results:
+        return
+
+    keys = results[0].keys()
+
+    with open(filename, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(results)
+
+    print(f"\n[INFO] Multi-seed results saved to: {filename}")
+
+
+'''
+Beállítja az összes random generátor seed-jét (Python, NumPy, PyTorch), hogy a futtatások reprodukálhatóak legyenek
+'''
+def set_all_seeds(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+'''
+Bitenkénti pontosság kiszámítása a modell kimenete és a valódi célérték között
+'''
+@torch.no_grad()
+def bitwise_accuracy_from_logits(logits, target):
+    pred = (torch.sigmoid(logits) > 0.5).float()
+    return (pred == target).float().mean().item()
+
+
+'''
+Mintánkénti átlagos hibás bitek számának kiszámítása
+'''
+@torch.no_grad()
+def hard_bit_error_from_logits(logits, target):
+    pred = (torch.sigmoid(logits) > 0.5).float()
+    return (pred != target).float().sum(dim=1).mean().item()
+
+
+'''
+Lehetővé teszi a modell paramétereinek befagyasztását vagy engedélyezését a tanítás során
+'''
+def set_requires_grad(model, flag: bool):
+    for p in model.parameters():
+        p.requires_grad = flag
+
+
+'''
+Alice kimenetéből előállítja a tényleges titkosított üzenetet és a hozzá tartozó maszkot
+Az encoding ág kimenetét hiperbolikus tangens aktivációval korlátozza, míg a maszk sigmoid aktivációval [0,1] tartományba kerül
+A végső cipher a maszk és az encoding elemenkénti szorzataként jön létre
+'''
+def alice_build_cipher(alice, msg, key):
+    enc_logits, mask_logits = alice(msg, key)
+
+    enc = torch.tanh(enc_logits)
+    mask = torch.sigmoid(mask_logits)
+
+    cipher = mask * enc
+    return cipher, mask
+
+
+'''
+Egy adott metrika átlagát és szórását számolja ki több seed alapján
+'''
+def mean_std(values):
+    arr = np.array(values, dtype=np.float64)
+    return arr.mean(), arr.std()
+
+
+'''
+Több seed-en végrehajtott kísérletek eredményeit összesíti és jeleníti meg
+Egyes metrikákra kiszámítja az átlagot és a szórást, majd seedenként részletes bontásban is kiírja az értékeket
+'''
+def print_multi_seed_summary(results):
+    print("\n=== MULTI-SEED SUMMARY ===")
+
+    metrics = [
+        "bob_final_acc",
+        "eve_final_acc",
+        "bob_wrong_key_final_acc",
+        "naive_cipher_final_acc",
+        "bob_final_hard_err",
+        "eve_final_hard_err",
+        "mask_mean_final",
+        "fresh_eve_mean_acc",
+        "fresh_eve_std_acc",
+        "fresh_eve_best_acc",
+        "fresh_eve_mean_hard_err",
+        "fresh_eve_std_hard_err",
+        "fresh_eve_best_hard_err",
+        "bob_frozen_eval_acc",
+        "bob_frozen_eval_hard_err",
+        "bob_frozen_eval_wrong_key_acc",
+    ]
+
+    for metric in metrics:
+        values = [r[metric] for r in results]
+        m, s = mean_std(values)
+        print(f"{metric}: {m:.6f} ± {s:.6f}")
+
+    print("\n=== PER-SEED RESULTS ===")
+    for r in results:
+        print(
+            f"seed={r['seed']} | "
+            f"Bob={r['bob_final_acc']:.4f} | "
+            f"Eve={r['eve_final_acc']:.4f} | "
+            f"WrongKey={r['bob_wrong_key_final_acc']:.4f} | "
+            f"Naive={r['naive_cipher_final_acc']:.4f} | "
+            f"Mask={r['mask_mean_final']:.4f} | "
+            f"FreshMean={r['fresh_eve_mean_acc']:.4f} | "
+            f"FreshBest={r['fresh_eve_best_acc']:.4f}"
+        )
+
+
+'''
+A több seed-en futtatott kísérletek eredményeinek részletes statisztikai jellemzését adja meg
+'''
+def print_distribution_summary(results):
+    print("\n=== DISTRIBUTION SUMMARY ===")
+
+    metrics = [
+        "bob_final_acc",
+        "eve_final_acc",
+        "bob_wrong_key_final_acc",
+        "naive_cipher_final_acc",
+        "bob_final_hard_err",
+        "eve_final_hard_err",
+        "mask_mean_final",
+        "fresh_eve_mean_acc",
+        "fresh_eve_std_acc",
+        "fresh_eve_best_acc",
+        "fresh_eve_mean_hard_err",
+        "fresh_eve_std_hard_err",
+        "fresh_eve_best_hard_err",
+        "bob_frozen_eval_acc",
+        "bob_frozen_eval_hard_err",
+        "bob_frozen_eval_wrong_key_acc",
+    ]
+
+    for metric in metrics:
+        values = [r[metric] for r in results]
+        stats = descriptive_stats(values)
+
+        print(f"\n[{metric}]")
+        print(f"mean:   {stats['mean']:.6f}")
+        print(f"std:    {stats['std']:.6f}")
+        print(f"min:    {stats['min']:.6f}")
+        print(f"q25:    {stats['q25']:.6f}")
+        print(f"median: {stats['median']:.6f}")
+        print(f"q75:    {stats['q75']:.6f}")
+        print(f"max:    {stats['max']:.6f}")
+
+
+'''
+Hisztogramok segítségével vizualizálja a különböző metrikák eloszlását a több seed-en futtatott kísérletek során
+'''
+def plot_metric_distributions(results):
+    metrics = [
+        ("bob_final_acc", "Bob final accuracy"),
+        ("eve_final_acc", "Eve final accuracy"),
+        ("bob_wrong_key_final_acc", "Bob wrong-key final accuracy"),
+        ("naive_cipher_final_acc", "Naive cipher final accuracy"),
+        ("bob_final_hard_err", "Bob final hard error"),
+        ("eve_final_hard_err", "Eve final hard error"),
+        ("mask_mean_final", "Mask mean final"),
+        ("fresh_eve_mean_acc", "Fresh Eve mean accuracy"),
+        ("fresh_eve_best_acc", "Fresh Eve best accuracy"),
+        ("fresh_eve_mean_hard_err", "Fresh Eve mean hard error"),
+        ("fresh_eve_best_hard_err", "Fresh Eve best hard error"),
+        ("bob_frozen_eval_acc", "Frozen Bob accuracy"),
+    ]
+
+    for metric_key, metric_name in metrics:
+        values = [r[metric_key] for r in results]
+
+        plt.figure(figsize=(8, 4))
+        plt.hist(values, bins=min(10, len(values)))
+        plt.title(f"Distribution of {metric_name}")
+        plt.xlabel(metric_name)
+        plt.ylabel("Frequency")
+        plt.tight_layout()
+        plt.show()
+
+
+'''
+Boxplot diagramokon ábrázolja a különböző metrikák eloszlását több seed-en futtatott kísérletek alapján
+'''
+def plot_metric_boxplots(results):
+    metrics = [
+        ("bob_final_acc", "Bob final acc"),
+        ("eve_final_acc", "Eve final acc"),
+        ("bob_wrong_key_final_acc", "Bob wrong-key acc"),
+        ("naive_cipher_final_acc", "Naive cipher acc"),
+        ("bob_final_hard_err", "Bob hard err"),
+        ("eve_final_hard_err", "Eve hard err"),
+        ("mask_mean_final", "Mask mean"),
+        ("fresh_eve_mean_acc", "Fresh Eve mean acc"),
+        ("fresh_eve_best_acc", "Fresh Eve best acc"),
+        ("fresh_eve_mean_hard_err", "Fresh Eve mean err"),
+        ("fresh_eve_best_hard_err", "Fresh Eve best err"),
+        ("bob_frozen_eval_acc", "Frozen Bob acc"),
+    ]
+
+    data = [[r[key] for r in results] for key, _ in metrics]
+    labels = [label for _, label in metrics]
+
+    plt.figure(figsize=(14, 6))
+    plt.boxplot(data, tick_labels=labels)
+    plt.title("Metric distributions across seeds")
+    plt.ylabel("Value")
+    plt.xticks(rotation=25)
+    plt.tight_layout()
+    plt.show()
+
+
+# ============================================================
+# TRAIN LOOP
+# ============================================================
+
+def train_game(
+    iters=100_000,
+    batch_size=256,
+    lr_alice=2e-5,
+    lr_bob=1e-3,
+    lr_eve=1e-4,
+    lambda_eve=LAMBDA_EVE,
+    lambda_mask=LAMBDA_MASK,
+    mask_target=MASK_TARGET,
+    print_every=10000,
+    eval_every=500,
+    warmup=10_000,
+    ramp=7_000,
+    seed=42,
+    use_eve_loss=True,
+    use_mask_loss=True,
+    use_ramp=True,
+):
+    set_all_seeds(seed)
+    alice = Alice().to(DEVICE)
+    bob = Bob().to(DEVICE)
+    eve = Eve().to(DEVICE)
+
+    opt_a = optim.Adam(alice.parameters(), lr=lr_alice)
+    opt_b = optim.Adam(bob.parameters(), lr=lr_bob)
+    opt_e = optim.AdamW(eve.parameters(), lr=lr_eve, weight_decay=5e-4)
+
+    history = {
+        "iter": [],
+        "bob_acc": [],
+        "eve_acc": [],
+        "bob_wrong_key_acc": [],
+        "naive_cipher_acc": [],
+        "loss_bob": [],
+        "loss_eve": [],
+        "loss_alice": [],
+        "bob_hard_err": [],
+        "eve_hard_err": [],
+        "mask_mean": [],
+        "use_eve_loss": use_eve_loss,
+        "use_mask_loss": use_mask_loss,
+        "use_ramp": use_ramp,
+    }
+
+    for it in range(1, iters + 1):
+        msg, key = generate_batch(batch_size)
+
+        '''
+        Ellenőrizzük a use_ramp változó értékét, így szabályozni tudjuk Eve kezdeti hatását (és befolyásolja a warmup változó értékét)
+            - Ha True, akkor három fázist hoz létre:
+                1. Warmup fázis:
+                    sched = 0
+                    lambda_now = 0
+                    Eve-nek nincs hatása Alice-re
+                2. Ramp fázis:
+                    sched lineárisan nő (0 -> 1)
+                    Eve egyre nagyobb tényező lesz Alice számára
+                3. Stabil fázis:
+                    sched = 1
+                    lambda_now = lambda_eve
+                    Eve teljes hatással lesz Alice működésére
+            - Ha False, akkor Eve a kezdetektől teljes hatással lesz Alice működésére
+        '''
+        if use_ramp:
+            sched = 0.0 if it < warmup else min(1.0, (it - warmup) / ramp)
+            lambda_now = lambda_eve * sched
+        else:
+            warmup = 0
+            lambda_now = lambda_eve
+
+        # ----------------------------------------------------
+        # Train Eve
+        # ----------------------------------------------------
+        '''
+        Eve globális iteráción belüli frissüléseinek számának meghatározása
+        A warmup változó értéke határozza meg, hogy Eve hanyadik iteráció után, mekkora intenzitással kezd el tanulni
+            - warmup előtt:
+                Eve nem tanul
+            - warmup után, de warmup + 5000 iteráció előtt:
+                Eve lassan elkezd tanulni, de még nem teljes intenzitással
+            - warmup + 5000 után:
+                Eve teljes intenzitással kezd el tanulni
+
+        (Ezt az értéket a use_ramp változó értéke is befolyásolja) 
+        '''
+        eve_steps = 0 if it < warmup else (1 if it < warmup + 5000 else 2)
+
+        for _ in range(eve_steps):
+            # Alice és Bob befagyasztása
+            set_requires_grad(alice, False)
+            set_requires_grad(bob, False)
+            set_requires_grad(eve, True)
+
+            # Titkosított jel előállítása
+            with torch.no_grad():
+                cipher, _ = alice_build_cipher(alice, msg, key)
+
+            opt_e.zero_grad()
+            # Eve becslést készít az üzenetre (a kulcs használata nélkül)
+            eve_logits = eve(cipher)
+            # A becslés helyességének vizsgálata
+            loss_e = bce(eve_logits, msg)
+            # Hibák visszaterjesztése Eve hálózatán
+            loss_e.backward()
+            # Eve paramétereinek frissítése
+            opt_e.step()
+
+        # ----------------------------------------------------
+        # Train Bob
+        # ----------------------------------------------------
+        for _ in range(BOB_STEPS_PER_ITER):
+            # Alice és Eve befagyasztása
+            set_requires_grad(alice, False)
+            set_requires_grad(bob, True)
+            set_requires_grad(eve, False)
+
+            with torch.no_grad():
+                # Titkosított jel előállítása
+                cipher, _ = alice_build_cipher(alice, msg, key)
+
+            opt_b.zero_grad()
+            # Bob becslést készít az üzenetre (a kulcs használatával)
+            bob_logits = bob(cipher, key)
+            # A becslés helyességének vizsgálata
+            loss_b = bce(bob_logits, msg)
+            # Hibák visszaterjesztése Bob hálózatán
+            loss_b.backward()
+            # Bob paramétereinek frissítése
+            opt_b.step()
+
+        # ----------------------------------------------------
+        # Train Alice
+        # ----------------------------------------------------
+        for _ in range(ALICE_STEPS_PER_ITER):
+            # Bob és Eve befagyasztása
+            set_requires_grad(alice, True)
+            set_requires_grad(bob, False)
+            set_requires_grad(eve, False)
+
+            opt_a.zero_grad()
+
+            # Cipher generálása
+            cipher, mask = alice_build_cipher(alice, msg, key)
+            # Bob próbálkozása dekódolni a ciphert a kulcs segítségével
+            bob_logits = bob(cipher, key)
+            # Eve próbálkozása dekódolni a ciphert a kulcs segítsége nélkül
+            eve_logits = eve(cipher)
+
+            # Bob-loss kiszámítása
+            loss_bob_for_alice = bce(bob_logits, msg)
+
+            eve_prob = torch.sigmoid(eve_logits)
+            eve_soft_bit_error = torch.abs(msg - eve_prob).sum(dim=1).mean()
+
+            n_half = MSG_BITS / 2.0
+            eve_random_term = ((n_half - eve_soft_bit_error) ** 2) / (n_half ** 2)
+
+            # Mask regularizáció kiszámítása (megakadályozza a full encoding vagy a null encoding előfordulását)
+            mask_mean_batch = mask.mean()
+            mask_reg = (mask_mean_batch - mask_target) ** 2
+
+            '''
+            Alice-loss összerakása
+                Ha use_eve_loss és use_mask_loss változók értéke False:
+                    - Alice csak a Bob-loss-t veszi figyelembe
+                Ha use_eve_loss változó True és use_mask_loss változó False:
+                    - loss_a = loss_bob_for_alice + lambda_now * eve_random_term
+                Ha use_eve_loss és use_mask_loss változók értéke True:
+                    - loss_a = loss_bob_for_alice + lambda_now * eve_random_term + lambda_mask * mask_reg
+            '''
+            loss_a = loss_bob_for_alice
+
+            if use_eve_loss:
+                if it >= warmup or not use_ramp:
+                    loss_a = loss_a + lambda_now * eve_random_term
+
+            if use_mask_loss:
+                loss_a = loss_a + lambda_mask * mask_reg
+
+            # Hibák visszaterjesztése Alice hálózatán
+            loss_a.backward()
+            # Alice paramétereinek frissítése
+            opt_a.step()
+
+        # -------------------------------------------------------
+        # A MODELL KIÉRTÉKELÉSE ÉS A MÉRÉSI EREDMÉNYEK NAPLÓZÁSA
+        # -------------------------------------------------------
+        if it % eval_every == 0 or it == 1:
+            with torch.no_grad():
+                # Új tesztadatok létrehozása az aktuális állapot mérésére
+                msg_t, key_t = generate_batch(batch_size)
+                # A titkosított jel és a hozzá tartozó masz előállítása Alice által
+                cipher_t, mask_t = alice_build_cipher(alice, msg_t, key_t)
+
+                # Bob visszafejtési kísérlete a kulcs használatával
+                bob_logits_t = bob(cipher_t, key_t)
+                # Eve visszafejtési kísérlete a kulcs használata nélkül
+                eve_logits_t = eve(cipher_t)
+
+                # Szándékosan rossz kulcsos változat létrehozása a rendszer kulcsfüggőségének vizsgálatához
+                wrong_key_t = torch.roll(key_t, shifts=1, dims=0)
+                # Bob visszafejtési kísérlete a rossz kulcs használatával
+                bob_wrong_key_logits_t = bob(cipher_t, wrong_key_t)
+
+                # Bitpontos pontosságok meghatározása
+                bob_acc = bitwise_accuracy_from_logits(bob_logits_t, msg_t)
+                eve_acc = bitwise_accuracy_from_logits(eve_logits_t, msg_t)
+                bob_wrong_key_acc = bitwise_accuracy_from_logits(bob_wrong_key_logits_t, msg_t)
+
+                # Bob és Eve veszteségértékei
+                loss_b_eval = bce(bob_logits_t, msg_t).item()
+                loss_e_eval = bce(eve_logits_t, msg_t).item()
+
+                # Az átlagos hibás bitszám mintánkénti kiszámítása
+                bob_hard_err = hard_bit_error_from_logits(bob_logits_t, msg_t)
+                eve_hard_err = hard_bit_error_from_logits(eve_logits_t, msg_t)
+
+                # Annak vizsgálata, hogy a cipher előjeléből mennyi információ olvasható ki,
+                # így annak vizsgálata, hogy van-e nyers szivárgás
+                naive_pred = (cipher_t > 0).float()
+                naive_acc = (naive_pred == msg_t).float().mean().item()
+
+                # A maszk átlagértékének kiszámítása, ami megmutatja, hogy Alice mennyire használja az encoding ágat
+                mask_mean_eval = mask_t.mean().item()
+
+            # Az értékek eltárolása későbbi feldolgozásra
+            history["iter"].append(it)
+            history["bob_acc"].append(bob_acc)
+            history["eve_acc"].append(eve_acc)
+            history["bob_wrong_key_acc"].append(bob_wrong_key_acc)
+            history["naive_cipher_acc"].append(naive_acc)
+            history["loss_bob"].append(loss_b_eval)
+            history["loss_eve"].append(loss_e_eval)
+            history["loss_alice"].append(loss_a.item())
+            history["bob_hard_err"].append(bob_hard_err)
+            history["eve_hard_err"].append(eve_hard_err)
+            history["mask_mean"].append(mask_mean_eval)
+
+        # Az aktuális mérési állapot kiíratása futás közben
+        if it % print_every == 0 or it == 1:
+            print(
+                f"Iter {it:6d} | "
+                f"Bob acc={history['bob_acc'][-1]:.4f} | "
+                f"Eve acc={history['eve_acc'][-1]:.4f} | "
+                f"Bob wrong-key acc={history['bob_wrong_key_acc'][-1]:.4f} | "
+                f"Naive cipher acc={history['naive_cipher_acc'][-1]:.4f} | "
+                f"Mask mean={history['mask_mean'][-1]:.4f} | "
+                f"L_bob={history['loss_bob'][-1]:.4f} | "
+                f"L_eve={history['loss_eve'][-1]:.4f} | "
+                f"L_alice={history['loss_alice'][-1]:.4f}"
+            )
+
+    return alice, bob, eve, history
+
+
+# ============================================================
+# FRESH EVE EVALUATION
+# ============================================================
+
+def evaluate_fresh_eves_on_frozen_alice_bob(
+    alice,
+    bob,
+    num_fresh_eves=NUM_FRESH_EVES,
+    iters=FRESH_EVE_ITERS,
+    batch_size=FRESH_EVE_BATCH_SIZE,
+    lr_eve=FRESH_EVE_LR,
+    eval_every=FRESH_EVE_EVAL_EVERY,
+    print_every=FRESH_EVE_PRINT_EVERY,
+    fixed_eval_samples=FRESH_FIXED_EVAL_SAMPLES,
+    base_seed=12345,
+):
+    '''
+    A seed végén lefagyasztott Alice és Bob mellett több, véletlen architektúrájú Eve modellt
+    tanít nulláról. Az Eve-k minden iterációban ugyanazon fagyasztott Alice által generált batch-en
+    frissülnek. Bob egy fix eval seten mérésre kerül, hogy ellenőrizhető legyen:
+    a fagyasztott állapot alatt semmilyen változás nem történik.
+    '''
+
+    rng = random.Random(base_seed)
+
+    freeze_model(alice)
+    freeze_model(bob)
+
+    fixed_msg_eval, fixed_key_eval = build_fixed_eval_set(
+        n_samples=fixed_eval_samples,
+        device=DEVICE
+    )
+
+    fresh_eves = []
+    fresh_optimizers = []
+    fresh_histories = []
+
+    # ----------------------------------------------------
+    # Random architektúrák létrehozása
+    # ----------------------------------------------------
+    for eve_idx in range(num_fresh_eves):
+        hidden_sizes = build_random_eve_architecture(rng)
+
+        init_seed = base_seed * 1000 + eve_idx
+        set_all_seeds(init_seed)
+
+        eve_model = RandomEve(hidden_sizes).to(DEVICE)
+        optimizer = optim.AdamW(eve_model.parameters(), lr=lr_eve, weight_decay=5e-4)
+
+        fresh_eves.append({
+            "id": eve_idx,
+            "init_seed": init_seed,
+            "hidden_sizes": hidden_sizes,
+            "model": eve_model,
+        })
+        fresh_optimizers.append(optimizer)
+
+        fresh_histories.append({
+            "iter": [],
+            "eve_acc": [],
+            "eve_hard_err": [],
+            "eve_loss": [],
+        })
+
+    bob_history = {
+        "iter": [],
+        "bob_acc": [],
+        "bob_hard_err": [],
+        "bob_wrong_key_acc": [],
+    }
+
+    # ----------------------------------------------------
+    # Több fresh Eve közös tréningje
+    # ----------------------------------------------------
+    for it in range(1, iters + 1):
+        msg, key = generate_batch(batch_size)
+
+        with torch.no_grad():
+            cipher, _ = alice_build_cipher(alice, msg, key)
+
+        for eve_pack, opt in zip(fresh_eves, fresh_optimizers):
+            eve_model = eve_pack["model"]
+            eve_model.train()
+            set_requires_grad(eve_model, True)
+
+            opt.zero_grad()
+            eve_logits = eve_model(cipher)
+            loss_e = bce(eve_logits, msg)
+            loss_e.backward()
+            opt.step()
+
+        # ------------------------------------------------
+        # Kiértékelés fix eval seten
+        # ------------------------------------------------
+        if it % eval_every == 0 or it == 1:
+            with torch.no_grad():
+                cipher_t, _ = alice_build_cipher(alice, fixed_msg_eval, fixed_key_eval)
+
+                bob_logits_t = bob(cipher_t, fixed_key_eval)
+                wrong_key_t = torch.roll(fixed_key_eval, shifts=1, dims=0)
+                bob_wrong_logits_t = bob(cipher_t, wrong_key_t)
+
+                bob_acc = bitwise_accuracy_from_logits(bob_logits_t, fixed_msg_eval)
+                bob_hard_err = hard_bit_error_from_logits(bob_logits_t, fixed_msg_eval)
+                bob_wrong_key_acc = bitwise_accuracy_from_logits(bob_wrong_logits_t, fixed_msg_eval)
+
+                bob_history["iter"].append(it)
+                bob_history["bob_acc"].append(bob_acc)
+                bob_history["bob_hard_err"].append(bob_hard_err)
+                bob_history["bob_wrong_key_acc"].append(bob_wrong_key_acc)
+
+                for idx, eve_pack in enumerate(fresh_eves):
+                    eve_model = eve_pack["model"]
+                    eve_model.eval()
+
+                    eve_logits_t = eve_model(cipher_t)
+                    eve_acc = bitwise_accuracy_from_logits(eve_logits_t, fixed_msg_eval)
+                    eve_hard_err = hard_bit_error_from_logits(eve_logits_t, fixed_msg_eval)
+                    eve_loss = bce(eve_logits_t, fixed_msg_eval).item()
+
+                    fresh_histories[idx]["iter"].append(it)
+                    fresh_histories[idx]["eve_acc"].append(eve_acc)
+                    fresh_histories[idx]["eve_hard_err"].append(eve_hard_err)
+                    fresh_histories[idx]["eve_loss"].append(eve_loss)
+
+        # ------------------------------------------------
+        # Futás közbeni log
+        # ------------------------------------------------
+        if it % print_every == 0 or it == 1:
+            eve_accs_now = []
+            for hist in fresh_histories:
+                if hist["eve_acc"]:
+                    eve_accs_now.append(hist["eve_acc"][-1])
+
+            mean_eve_acc = float(np.mean(eve_accs_now)) if eve_accs_now else float("nan")
+            best_eve_acc = float(np.max(eve_accs_now)) if eve_accs_now else float("nan")
+
+            if bob_history["bob_acc"]:
+                current_bob_acc = bob_history["bob_acc"][-1]
+                current_bob_wrong = bob_history["bob_wrong_key_acc"][-1]
+            else:
+                current_bob_acc = float("nan")
+                current_bob_wrong = float("nan")
+
+            print(
+                f"[Fresh Eve Ensemble] Iter {it:6d} | "
+                f"Bob acc={current_bob_acc:.4f} | "
+                f"Bob wrong-key acc={current_bob_wrong:.4f} | "
+                f"Fresh Eve mean acc={mean_eve_acc:.4f} | "
+                f"Fresh Eve best acc={best_eve_acc:.4f}"
+            )
+
+    # ----------------------------------------------------
+    # Végső eredmények összerakása
+    # ----------------------------------------------------
+    fresh_results = []
+
+    for eve_pack, hist in zip(fresh_eves, fresh_histories):
+        result = {
+            "eve_id": eve_pack["id"],
+            "init_seed": eve_pack["init_seed"],
+            "hidden_sizes": str(eve_pack["hidden_sizes"]),
+            "full_architecture": format_eve_architecture(eve_pack["hidden_sizes"]),
+            "num_hidden_layers": len(eve_pack["hidden_sizes"]),
+            "max_width": max(eve_pack["hidden_sizes"]),
+            "eve_final_acc": hist["eve_acc"][-1],
+            "eve_final_hard_err": hist["eve_hard_err"][-1],
+            "eve_final_loss": hist["eve_loss"][-1],
+        }
+        fresh_results.append(result)
+
+    return fresh_results, fresh_histories, bob_history
+
+
+'''
+A frissen inicializált és tanított Eve hálózatok teljesítményének statisztikai összegzése
+'''
+def summarize_fresh_eve_results(fresh_results):
+    accs = [r["eve_final_acc"] for r in fresh_results]
+    errs = [r["eve_final_hard_err"] for r in fresh_results]
+    losses = [r["eve_final_loss"] for r in fresh_results]
+
+    best_by_acc = max(fresh_results, key=lambda x: x["eve_final_acc"])
+    best_by_err = min(fresh_results, key=lambda x: x["eve_final_hard_err"])
+
+    return {
+        "fresh_eve_mean_acc": float(np.mean(accs)),
+        "fresh_eve_std_acc": float(np.std(accs)),
+        "fresh_eve_best_acc": float(best_by_acc["eve_final_acc"]),
+        "fresh_eve_best_acc_id": int(best_by_acc["eve_id"]),
+        "fresh_eve_best_acc_seed": int(best_by_acc["init_seed"]),
+        "fresh_eve_best_acc_arch": best_by_acc["hidden_sizes"],
+        "fresh_eve_best_acc_full_arch": best_by_acc["full_architecture"],
+
+        "fresh_eve_mean_hard_err": float(np.mean(errs)),
+        "fresh_eve_std_hard_err": float(np.std(errs)),
+        "fresh_eve_best_hard_err": float(best_by_err["eve_final_hard_err"]),
+        "fresh_eve_best_hard_err_id": int(best_by_err["eve_id"]),
+        "fresh_eve_best_hard_err_seed": int(best_by_err["init_seed"]),
+        "fresh_eve_best_hard_err_arch": best_by_err["hidden_sizes"],
+        "fresh_eve_best_hard_err_full_arch": best_by_err["full_architecture"],
+
+        "fresh_eve_mean_loss": float(np.mean(losses)),
+        "fresh_eve_std_loss": float(np.std(losses)),
+    }
+
+
+'''
+A frissen inicializált Eve modellek kiértékelési eredményeinek részletes, strukturált megjelenítése egy adott seed esetén
+'''
+def print_fresh_eve_results_for_seed(seed, fresh_results, summary, bob_history):
+    print(f"\n=== FRESH EVE RESULTS FOR SEED {seed} ===")
+
+    for r in fresh_results:
+        print(
+            f"Eve#{r['eve_id']:02d} | "
+            f"init_seed={r['init_seed']} | "
+            f"layers={r['num_hidden_layers']} | "
+            f"max_width={r['max_width']:3d} | "
+            f"hidden={r['hidden_sizes']} | "
+            f"full={r['full_architecture']} | "
+            f"acc={r['eve_final_acc']:.6f} | "
+            f"hard_err={r['eve_final_hard_err']:.6f} | "
+            f"loss={r['eve_final_loss']:.6f}"
+        )
+
+    print("\n--- FRESH EVE SUMMARY ---")
+    print(f"fresh_eve_mean_acc:              {summary['fresh_eve_mean_acc']:.6f}")
+    print(f"fresh_eve_std_acc:               {summary['fresh_eve_std_acc']:.6f}")
+    print(f"fresh_eve_best_acc:              {summary['fresh_eve_best_acc']:.6f}")
+    print(f"fresh_eve_best_acc_id:           {summary['fresh_eve_best_acc_id']}")
+    print(f"fresh_eve_best_acc_seed:         {summary['fresh_eve_best_acc_seed']}")
+    print(f"fresh_eve_best_acc_arch:         {summary['fresh_eve_best_acc_arch']}")
+    print(f"fresh_eve_best_acc_full_arch:    {summary['fresh_eve_best_acc_full_arch']}")
+
+    print(f"fresh_eve_mean_hard_err:         {summary['fresh_eve_mean_hard_err']:.6f}")
+    print(f"fresh_eve_std_hard_err:          {summary['fresh_eve_std_hard_err']:.6f}")
+    print(f"fresh_eve_best_hard_err:         {summary['fresh_eve_best_hard_err']:.6f}")
+    print(f"fresh_eve_best_hard_err_id:      {summary['fresh_eve_best_hard_err_id']}")
+    print(f"fresh_eve_best_hard_err_seed:    {summary['fresh_eve_best_hard_err_seed']}")
+    print(f"fresh_eve_best_hard_err_arch:    {summary['fresh_eve_best_hard_err_arch']}")
+    print(f"fresh_eve_best_hard_err_full_arch: {summary['fresh_eve_best_hard_err_full_arch']}")
+
+    print(f"fresh_eve_mean_loss:             {summary['fresh_eve_mean_loss']:.6f}")
+    print(f"fresh_eve_std_loss:              {summary['fresh_eve_std_loss']:.6f}")
+
+    print("\n--- BEST FRESH EVE BY ACCURACY ---")
+    print(f"id:           {summary['fresh_eve_best_acc_id']}")
+    print(f"init_seed:    {summary['fresh_eve_best_acc_seed']}")
+    print(f"hidden:       {summary['fresh_eve_best_acc_arch']}")
+    print(f"full:         {summary['fresh_eve_best_acc_full_arch']}")
+    print(f"accuracy:     {summary['fresh_eve_best_acc']:.6f}")
+
+    print("\n--- BEST FRESH EVE BY HARD ERROR ---")
+    print(f"id:           {summary['fresh_eve_best_hard_err_id']}")
+    print(f"init_seed:    {summary['fresh_eve_best_hard_err_seed']}")
+    print(f"hidden:       {summary['fresh_eve_best_hard_err_arch']}")
+    print(f"full:         {summary['fresh_eve_best_hard_err_full_arch']}")
+    print(f"hard error:   {summary['fresh_eve_best_hard_err']:.6f}")
+
+    print("\n--- FROZEN BOB CONSISTENCY CHECK ---")
+    print(f"Bob final acc during fresh-Eve eval:       {bob_history['bob_acc'][-1]:.6f}")
+    print(f"Bob final hard err during fresh-Eve eval:  {bob_history['bob_hard_err'][-1]:.6f}")
+    print(f"Bob wrong-key acc during fresh-Eve eval:   {bob_history['bob_wrong_key_acc'][-1]:.6f}")
+
+
+# ============================================================
+# PLOTS
+# ============================================================
+
+'''
+A fő tréning közbeni viselkedés kirajzolása
+'''
+def plot_history(history):
+    iters = history["iter"]
+
+    plt.figure(figsize=(12, 5))
+    plt.plot(iters, history["bob_acc"], label="Bob accuracy")
+    plt.plot(iters, history["eve_acc"], label="Eve accuracy")
+    plt.plot(iters, history["bob_wrong_key_acc"], label="Bob wrong-key accuracy")
+    plt.plot(iters, history["naive_cipher_acc"], label="Naive cipher accuracy")
+    plt.title("Accuracy over training")
+    plt.xlabel("Iteration")
+    plt.ylabel("Bitwise accuracy")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    plt.figure(figsize=(12, 5))
+    plt.plot(iters, history["loss_bob"], label="Bob BCE loss")
+    plt.plot(iters, history["loss_eve"], label="Eve BCE loss")
+    plt.plot(iters, history["loss_alice"], label="Alice objective")
+    plt.title("Losses over training")
+    plt.xlabel("Iteration")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    plt.figure(figsize=(12, 5))
+    plt.plot(iters, history["bob_hard_err"], label="Bob hard bit error")
+    plt.plot(iters, history["eve_hard_err"], label="Eve hard bit error")
+    plt.axhline(MSG_BITS / 2.0, linestyle="--", label="Random level")
+    plt.title("Hard bit error over training")
+    plt.xlabel("Iteration")
+    plt.ylabel("Avg wrong bits / sample")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    plt.figure(figsize=(12, 5))
+    plt.plot(iters, history["mask_mean"], label="Mask mean")
+    plt.axhline(MASK_TARGET, linestyle="--", label="Mask target")
+    plt.title("Mask mean over training")
+    plt.xlabel("Iteration")
+    plt.ylabel("Mean mask value")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
+# ============================================================
+# GYORSTESZT
+# ============================================================
+
+'''
+A modell működésének egyetlen mintán való szemléltetése
+Egy véletlen üzenet és kulcs generálása után megjeleníti a titkosított jelet,
+a maszk értékeit, valamint Bob és Eve dekódolt kimenetét
+'''
+@torch.no_grad()
+def run_quick_demo(alice, bob, eve):
+    msg, key = generate_batch(batch_size=1)
+    cipher, mask = alice_build_cipher(alice, msg, key)
+
+    bob_out = (torch.sigmoid(bob(cipher, key)) > 0.5).int()
+    eve_out = (torch.sigmoid(eve(cipher)) > 0.5).int()
+
+    print("\nMESSAGE:     ", msg.int().cpu().numpy())
+    print("KEY:         ", key.int().cpu().numpy())
+    print("MASK:        ", mask.cpu().numpy())
+    print("MASK>0.5:    ", (mask > 0.5).int().cpu().numpy())
+    print("CIPHER RAW:  ", cipher.cpu().numpy())
+    print("CIPHER SIGN: ", (cipher > 0).int().cpu().numpy())
+    print("BOB OUT:     ", bob_out.cpu().numpy())
+    print("EVE OUT:     ", eve_out.cpu().numpy())
+
+
+# ============================================================
+# MAIN
+# ============================================================
+
+if __name__ == "__main__":
+    print("Device:", DEVICE)
+
+    #SEEDS = [11, 22]
+    SEEDS = [11, 22, 33, 44, 55]
+    '''
+    SEEDS = [
+        11, 22, 33, 44, 55,
+        66, 77, 88, 99, 111,
+        122, 133, 144, 155, 166,
+        177, 188, 199, 211, 222,
+        233, 244, 255, 266, 277
+    ]
+    '''
+
+    all_results = []
+    all_fresh_eve_results = []
+    last_run = None
+
+    '''
+    A kísérlet végrehajtása
+    Elindul a tanítási folyamat, eltárolja az adott futási folyamat eredményeit
+    '''
+    for seed in SEEDS:
+        print("\n" + "=" * 60)
+        print(f"RUN START | seed = {seed}")
+        print("=" * 60)
+
+        alice, bob, eve, hist = train_game(
+            iters=100_000,
+            batch_size=256,
+            lr_alice=2e-5,
+            lr_bob=1e-3,
+            lr_eve=1e-4,
+            lambda_eve=LAMBDA_EVE,
+            lambda_mask=LAMBDA_MASK,
+            mask_target=MASK_TARGET,
+            print_every=10000,
+            eval_every=500,
+            warmup=10_000,
+            ramp=7_000,
+            seed=seed,
+            use_eve_loss=USE_EVE_LOSS,
+            use_mask_loss=USE_MASK_LOSS,
+            use_ramp=USE_RAMP,
+        )
+
+        '''
+        Egy adott seedhez tartozó végleges, már betanított kommunikációs rendszer ellenállásának külön vizsgálata több,
+        újonnan létrehozott Eve modell segítségével
+        '''
+        fresh_results, fresh_histories, bob_frozen_history = evaluate_fresh_eves_on_frozen_alice_bob(
+            alice=alice,
+            bob=bob,
+            num_fresh_eves=NUM_FRESH_EVES,
+            iters=FRESH_EVE_ITERS,
+            batch_size=FRESH_EVE_BATCH_SIZE,
+            lr_eve=FRESH_EVE_LR,
+            eval_every=FRESH_EVE_EVAL_EVERY,
+            print_every=FRESH_EVE_PRINT_EVERY,
+            fixed_eval_samples=FRESH_FIXED_EVAL_SAMPLES,
+            base_seed=seed,
+        )
+
+        fresh_summary = summarize_fresh_eve_results(fresh_results)
+
+        print_fresh_eve_results_for_seed(
+            seed=seed,
+            fresh_results=fresh_results,
+            summary=fresh_summary,
+            bob_history=bob_frozen_history,
+        )
+
+        for r in fresh_results:
+            row = dict(r)
+            row["parent_seed"] = seed
+            all_fresh_eve_results.append(row)
+
+        # Eredmények összegyűjtése
+        run_result = {
+            "seed": seed,
+            "bob_final_acc": hist["bob_acc"][-1],
+            "eve_final_acc": hist["eve_acc"][-1],
+            "bob_wrong_key_final_acc": hist["bob_wrong_key_acc"][-1],
+            "naive_cipher_final_acc": hist["naive_cipher_acc"][-1],
+            "bob_final_hard_err": hist["bob_hard_err"][-1],
+            "eve_final_hard_err": hist["eve_hard_err"][-1],
+            "mask_mean_final": hist["mask_mean"][-1],
+
+            "fresh_eve_mean_acc": fresh_summary["fresh_eve_mean_acc"],
+            "fresh_eve_std_acc": fresh_summary["fresh_eve_std_acc"],
+            "fresh_eve_best_acc": fresh_summary["fresh_eve_best_acc"],
+
+            "fresh_eve_mean_hard_err": fresh_summary["fresh_eve_mean_hard_err"],
+            "fresh_eve_std_hard_err": fresh_summary["fresh_eve_std_hard_err"],
+            "fresh_eve_best_hard_err": fresh_summary["fresh_eve_best_hard_err"],
+
+            "fresh_eve_mean_loss": fresh_summary["fresh_eve_mean_loss"],
+            "fresh_eve_std_loss": fresh_summary["fresh_eve_std_loss"],
+
+            "fresh_eve_best_acc_id": fresh_summary["fresh_eve_best_acc_id"],
+            "fresh_eve_best_acc_seed": fresh_summary["fresh_eve_best_acc_seed"],
+            "fresh_eve_best_acc_arch": fresh_summary["fresh_eve_best_acc_arch"],
+            "fresh_eve_best_acc_full_arch": fresh_summary["fresh_eve_best_acc_full_arch"],
+
+            "fresh_eve_best_hard_err_id": fresh_summary["fresh_eve_best_hard_err_id"],
+            "fresh_eve_best_hard_err_seed": fresh_summary["fresh_eve_best_hard_err_seed"],
+            "fresh_eve_best_hard_err_arch": fresh_summary["fresh_eve_best_hard_err_arch"],
+            "fresh_eve_best_hard_err_full_arch": fresh_summary["fresh_eve_best_hard_err_full_arch"],
+
+            "bob_frozen_eval_acc": bob_frozen_history["bob_acc"][-1],
+            "bob_frozen_eval_hard_err": bob_frozen_history["bob_hard_err"][-1],
+            "bob_frozen_eval_wrong_key_acc": bob_frozen_history["bob_wrong_key_acc"][-1],
+        }
+
+        all_results.append(run_result)
+        last_run = (alice, bob, eve, hist)
+
+        print("\n--- RUN RESULT ---")
+        print(f"seed:                        {seed}")
+        print(f"bob_final_acc:               {run_result['bob_final_acc']:.6f}")
+        print(f"eve_final_acc:               {run_result['eve_final_acc']:.6f}")
+        print(f"bob_wrong_key_acc:           {run_result['bob_wrong_key_final_acc']:.6f}")
+        print(f"naive_cipher_acc:            {run_result['naive_cipher_final_acc']:.6f}")
+        print(f"bob_final_hard_err:          {run_result['bob_final_hard_err']:.6f}")
+        print(f"eve_final_hard_err:          {run_result['eve_final_hard_err']:.6f}")
+        print(f"mask_mean_final:             {run_result['mask_mean_final']:.6f}")
+        print(f"fresh_eve_mean_acc:          {run_result['fresh_eve_mean_acc']:.6f}")
+        print(f"fresh_eve_best_acc:          {run_result['fresh_eve_best_acc']:.6f}")
+        print(f"fresh_eve_best_acc_arch:     {run_result['fresh_eve_best_acc_full_arch']}")
+        print(f"fresh_eve_mean_hard_err:     {run_result['fresh_eve_mean_hard_err']:.6f}")
+        print(f"fresh_eve_best_hard_err:     {run_result['fresh_eve_best_hard_err']:.6f}")
+        print(f"fresh_eve_best_err_arch:     {run_result['fresh_eve_best_hard_err_full_arch']}")
+        print(f"bob_frozen_eval_acc:         {run_result['bob_frozen_eval_acc']:.6f}")
+        print(f"bob_frozen_eval_wrong_key:   {run_result['bob_frozen_eval_wrong_key_acc']:.6f}")
+
+    # Opcionálisan az utolsó futás külön vizsgálata
+    if last_run is not None:
+        alice, bob, eve, hist = last_run
+        plot_history(hist)
+        run_quick_demo(alice, bob, eve)
+
+    # Összesített kiértékelés
+    print_multi_seed_summary(all_results)
+    print_distribution_summary(all_results)
+    plot_metric_distributions(all_results)
+    plot_metric_boxplots(all_results)
+    #save_multi_seed_results(all_results, filename="multi_seed_results.csv")

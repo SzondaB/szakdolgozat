@@ -1,0 +1,647 @@
+============================================================
+RUN START | seed = 11
+============================================================
+Iter      1 | Bob acc=0.5048 | Eve acc=0.4990 | Bob wrong-key acc=0.5067 | Bob wrong-nonce acc=0.5054 | Naive cipher acc=0.4957 | L_bob=0.6934 | L_bob_nonce=0.0000 | L_eve=0.6940 | L_alice=0.6928
+Iter  10000 | Bob acc=0.8276 | Eve acc=0.5013 | Bob wrong-key acc=0.6473 | Bob wrong-nonce acc=0.5887 | Naive cipher acc=0.5081 | L_bob=0.3041 | L_bob_nonce=0.0260 | L_eve=0.6938 | L_alice=0.3026
+Iter  20000 | Bob acc=0.8760 | Eve acc=0.6473 | Bob wrong-key acc=0.6476 | Bob wrong-nonce acc=0.5605 | Naive cipher acc=0.4996 | L_bob=0.2283 | L_bob_nonce=0.0144 | L_eve=0.5955 | L_alice=0.2636
+Iter  30000 | Bob acc=0.8821 | Eve acc=0.6589 | Bob wrong-key acc=0.6360 | Bob wrong-nonce acc=0.5543 | Naive cipher acc=0.5017 | L_bob=0.2077 | L_bob_nonce=0.0113 | L_eve=0.5945 | L_alice=0.2360
+Iter  40000 | Bob acc=0.8705 | Eve acc=0.6654 | Bob wrong-key acc=0.6510 | Bob wrong-nonce acc=0.5511 | Naive cipher acc=0.5049 | L_bob=0.2225 | L_bob_nonce=0.0102 | L_eve=0.5900 | L_alice=0.2569
+Iter  50000 | Bob acc=0.8933 | Eve acc=0.6753 | Bob wrong-key acc=0.6425 | Bob wrong-nonce acc=0.5726 | Naive cipher acc=0.4918 | L_bob=0.1896 | L_bob_nonce=0.0198 | L_eve=0.5768 | L_alice=0.2290
+Iter  60000 | Bob acc=0.8950 | Eve acc=0.6705 | Bob wrong-key acc=0.6011 | Bob wrong-nonce acc=0.5432 | Naive cipher acc=0.5010 | L_bob=0.1866 | L_bob_nonce=0.0072 | L_eve=0.5838 | L_alice=0.2063
+Iter  70000 | Bob acc=0.8986 | Eve acc=0.6804 | Bob wrong-key acc=0.5930 | Bob wrong-nonce acc=0.5529 | Naive cipher acc=0.4921 | L_bob=0.1818 | L_bob_nonce=0.0104 | L_eve=0.5824 | L_alice=0.2156
+Iter  80000 | Bob acc=0.9098 | Eve acc=0.6802 | Bob wrong-key acc=0.5980 | Bob wrong-nonce acc=0.5660 | Naive cipher acc=0.4962 | L_bob=0.1587 | L_bob_nonce=0.0164 | L_eve=0.5791 | L_alice=0.2002
+Iter  90000 | Bob acc=0.9093 | Eve acc=0.6768 | Bob wrong-key acc=0.6050 | Bob wrong-nonce acc=0.5742 | Naive cipher acc=0.4951 | L_bob=0.1433 | L_bob_nonce=0.0217 | L_eve=0.5829 | L_alice=0.1894
+Iter 100000 | Bob acc=0.8920 | Eve acc=0.6577 | Bob wrong-key acc=0.5801 | Bob wrong-nonce acc=0.5587 | Naive cipher acc=0.5098 | L_bob=0.1846 | L_bob_nonce=0.0132 | L_eve=0.6056 | L_alice=0.2021
+[Fresh Eve Ensemble] Iter      1 | Bob acc=0.8973 | Bob wrong-key acc=0.5839 | Bob wrong-nonce acc=0.5505 | Fresh Eve mean acc=0.4981 | Fresh Eve best acc=0.5076
+[Fresh Eve Ensemble] Iter   5000 | Bob acc=0.8962 | Bob wrong-key acc=0.5798 | Bob wrong-nonce acc=0.5604 | Fresh Eve mean acc=0.5987 | Fresh Eve best acc=0.6492
+[Fresh Eve Ensemble] Iter  10000 | Bob acc=0.8979 | Bob wrong-key acc=0.5734 | Bob wrong-nonce acc=0.5642 | Fresh Eve mean acc=0.6209 | Fresh Eve best acc=0.6838
+[Fresh Eve Ensemble] Iter  15000 | Bob acc=0.8940 | Bob wrong-key acc=0.5919 | Bob wrong-nonce acc=0.5684 | Fresh Eve mean acc=0.6337 | Fresh Eve best acc=0.6975
+[Fresh Eve Ensemble] Iter  20000 | Bob acc=0.8942 | Bob wrong-key acc=0.5822 | Bob wrong-nonce acc=0.5607 | Fresh Eve mean acc=0.6572 | Fresh Eve best acc=0.7286
+
+=== FRESH EVE RESULTS FOR SEED 11 ===
+Eve#00 | init_seed=11000 | layers=4 | max_width=605 | hidden=[605, 508, 494, 552] | full=64 -> 605 -> 508 -> 494 -> 552 -> 32 | acc=0.728638 | hard_err=8.683594 | loss=0.521227
+Eve#01 | init_seed=11001 | layers=7 | max_width=676 | hidden=[633, 226, 221, 556, 519, 676, 660] | full=64 -> 633 -> 226 -> 221 -> 556 -> 519 -> 676 -> 660 -> 32 | acc=0.645996 | hard_err=11.328125 | loss=0.609565
+Eve#02 | init_seed=11002 | layers=7 | max_width=583 | hidden=[222, 128, 489, 342, 177, 124, 583] | full=64 -> 222 -> 128 -> 489 -> 342 -> 177 -> 124 -> 583 -> 32 | acc=0.620117 | hard_err=12.156250 | loss=0.634123
+Eve#03 | init_seed=11003 | layers=7 | max_width=742 | hidden=[742, 681, 74, 641, 437, 495, 701] | full=64 -> 742 -> 681 -> 74 -> 641 -> 437 -> 495 -> 701 -> 32 | acc=0.654175 | hard_err=11.066406 | loss=0.602242
+Eve#04 | init_seed=11004 | layers=6 | max_width=697 | hidden=[662, 697, 193, 670, 47, 573] | full=64 -> 662 -> 697 -> 193 -> 670 -> 47 -> 573 -> 32 | acc=0.658936 | hard_err=10.914062 | loss=0.599792
+Eve#05 | init_seed=11005 | layers=1 | max_width= 92 | hidden=[92] | full=64 -> 92 -> 32 | acc=0.641479 | hard_err=11.472656 | loss=0.626615
+Eve#06 | init_seed=11006 | layers=1 | max_width=226 | hidden=[226] | full=64 -> 226 -> 32 | acc=0.674072 | hard_err=10.429688 | loss=0.599005
+Eve#07 | init_seed=11007 | layers=2 | max_width=646 | hidden=[646, 62] | full=64 -> 646 -> 62 -> 32 | acc=0.686279 | hard_err=10.039062 | loss=0.572916
+Eve#08 | init_seed=11008 | layers=7 | max_width=637 | hidden=[507, 366, 483, 637, 232, 563, 271] | full=64 -> 507 -> 366 -> 483 -> 637 -> 232 -> 563 -> 271 -> 32 | acc=0.634277 | hard_err=11.703125 | loss=0.617349
+Eve#09 | init_seed=11009 | layers=6 | max_width=710 | hidden=[333, 543, 36, 710, 119, 500] | full=64 -> 333 -> 543 -> 36 -> 710 -> 119 -> 500 -> 32 | acc=0.649170 | hard_err=11.226562 | loss=0.606912
+Eve#10 | init_seed=11010 | layers=6 | max_width=756 | hidden=[316, 448, 596, 117, 756, 292] | full=64 -> 316 -> 448 -> 596 -> 117 -> 756 -> 292 -> 32 | acc=0.669556 | hard_err=10.574219 | loss=0.593257
+Eve#11 | init_seed=11011 | layers=3 | max_width=557 | hidden=[267, 557, 327] | full=64 -> 267 -> 557 -> 327 -> 32 | acc=0.723755 | hard_err=8.839844 | loss=0.529658
+Eve#12 | init_seed=11012 | layers=1 | max_width=103 | hidden=[103] | full=64 -> 103 -> 32 | acc=0.645996 | hard_err=11.328125 | loss=0.623335
+Eve#13 | init_seed=11013 | layers=5 | max_width=442 | hidden=[142, 442, 142, 329, 427] | full=64 -> 142 -> 442 -> 142 -> 329 -> 427 -> 32 | acc=0.666260 | hard_err=10.679688 | loss=0.588311
+Eve#14 | init_seed=11014 | layers=1 | max_width= 49 | hidden=[49] | full=64 -> 49 -> 32 | acc=0.629761 | hard_err=11.847656 | loss=0.642432
+Eve#15 | init_seed=11015 | layers=7 | max_width=733 | hidden=[733, 32, 250, 246, 85, 513, 416] | full=64 -> 733 -> 32 -> 250 -> 246 -> 85 -> 513 -> 416 -> 32 | acc=0.637573 | hard_err=11.597656 | loss=0.619305
+Eve#16 | init_seed=11016 | layers=6 | max_width=676 | hidden=[438, 461, 106, 611, 676, 235] | full=64 -> 438 -> 461 -> 106 -> 611 -> 676 -> 235 -> 32 | acc=0.650391 | hard_err=11.187500 | loss=0.606869
+Eve#17 | init_seed=11017 | layers=7 | max_width=723 | hidden=[723, 308, 376, 121, 350, 372, 47] | full=64 -> 723 -> 308 -> 376 -> 121 -> 350 -> 372 -> 47 -> 32 | acc=0.612061 | hard_err=12.414062 | loss=0.637788
+Eve#18 | init_seed=11018 | layers=4 | max_width=755 | hidden=[152, 169, 284, 755] | full=64 -> 152 -> 169 -> 284 -> 755 -> 32 | acc=0.690430 | hard_err=9.906250 | loss=0.567201
+Eve#19 | init_seed=11019 | layers=1 | max_width= 43 | hidden=[43] | full=64 -> 43 -> 32 | acc=0.624146 | hard_err=12.027344 | loss=0.644924
+
+--- FRESH EVE SUMMARY ---
+fresh_eve_mean_acc:              0.657153
+fresh_eve_std_acc:               0.030653
+fresh_eve_best_acc:              0.728638
+fresh_eve_best_acc_id:           0
+fresh_eve_best_acc_seed:         11000
+fresh_eve_best_acc_arch:         [605, 508, 494, 552]
+fresh_eve_best_acc_full_arch:    64 -> 605 -> 508 -> 494 -> 552 -> 32
+fresh_eve_mean_hard_err:         10.971094
+fresh_eve_std_hard_err:          0.980897
+fresh_eve_best_hard_err:         8.683594
+fresh_eve_best_hard_err_id:      0
+fresh_eve_best_hard_err_seed:    11000
+fresh_eve_best_hard_err_arch:    [605, 508, 494, 552]
+fresh_eve_best_hard_err_full_arch: 64 -> 605 -> 508 -> 494 -> 552 -> 32
+
+--- FROZEN BOB CONSISTENCY CHECK ---
+Bob final acc during fresh-Eve eval:        0.894165
+Bob final hard err during fresh-Eve eval:   3.386719
+Bob wrong-key acc during fresh-Eve eval:    0.582153
+Bob wrong-nonce acc during fresh-Eve eval:  0.560669
+
+--- RUN RESULT ---
+seed:                    11
+bob_final_acc:           0.891968
+eve_final_acc:           0.657715
+bob_wrong_key_acc:       0.580078
+bob_wrong_nonce_acc:     0.558716
+naive_cipher_acc:        0.509766
+bob_final_hard_err:      3.457031
+eve_final_hard_err:      10.953125
+fresh_eve_mean_acc:          0.657153
+fresh_eve_best_acc:          0.728638
+fresh_eve_best_acc_arch:     64 -> 605 -> 508 -> 494 -> 552 -> 32
+fresh_eve_mean_hard_err:     10.971094
+fresh_eve_best_hard_err:     8.683594
+fresh_eve_best_err_arch:     64 -> 605 -> 508 -> 494 -> 552 -> 32
+bob_frozen_eval_acc:         0.894165
+bob_frozen_eval_wrong_key:   0.582153
+bob_frozen_eval_wrong_nonce: 0.560669
+
+============================================================
+RUN START | seed = 22
+============================================================
+Iter      1 | Bob acc=0.4915 | Eve acc=0.5035 | Bob wrong-key acc=0.4913 | Bob wrong-nonce acc=0.4923 | Naive cipher acc=0.4951 | L_bob=0.6945 | L_bob_nonce=0.0000 | L_eve=0.6940 | L_alice=0.6928
+Iter  10000 | Bob acc=0.8374 | Eve acc=0.4993 | Bob wrong-key acc=0.6969 | Bob wrong-nonce acc=0.6099 | Naive cipher acc=0.4954 | L_bob=0.2954 | L_bob_nonce=0.0397 | L_eve=0.6939 | L_alice=0.2993
+Iter  20000 | Bob acc=0.8794 | Eve acc=0.6469 | Bob wrong-key acc=0.7046 | Bob wrong-nonce acc=0.5573 | Naive cipher acc=0.4896 | L_bob=0.2346 | L_bob_nonce=0.0117 | L_eve=0.5813 | L_alice=0.2535
+Iter  30000 | Bob acc=0.8890 | Eve acc=0.6704 | Bob wrong-key acc=0.6693 | Bob wrong-nonce acc=0.5310 | Naive cipher acc=0.4906 | L_bob=0.2059 | L_bob_nonce=0.0031 | L_eve=0.5887 | L_alice=0.2417
+Iter  40000 | Bob acc=0.8516 | Eve acc=0.6375 | Bob wrong-key acc=0.6552 | Bob wrong-nonce acc=0.5913 | Naive cipher acc=0.5002 | L_bob=0.2777 | L_bob_nonce=0.0319 | L_eve=0.6107 | L_alice=0.2895
+Iter  50000 | Bob acc=0.8618 | Eve acc=0.6545 | Bob wrong-key acc=0.6533 | Bob wrong-nonce acc=0.5887 | Naive cipher acc=0.5035 | L_bob=0.2559 | L_bob_nonce=0.0295 | L_eve=0.6013 | L_alice=0.2789
+Iter  60000 | Bob acc=0.8947 | Eve acc=0.6644 | Bob wrong-key acc=0.6448 | Bob wrong-nonce acc=0.6030 | Naive cipher acc=0.5140 | L_bob=0.1895 | L_bob_nonce=0.0411 | L_eve=0.5949 | L_alice=0.2223
+Iter  70000 | Bob acc=0.8911 | Eve acc=0.6752 | Bob wrong-key acc=0.6199 | Bob wrong-nonce acc=0.5604 | Naive cipher acc=0.4873 | L_bob=0.1805 | L_bob_nonce=0.0151 | L_eve=0.5824 | L_alice=0.2095
+Iter  80000 | Bob acc=0.8927 | Eve acc=0.6659 | Bob wrong-key acc=0.6169 | Bob wrong-nonce acc=0.5944 | Naive cipher acc=0.5013 | L_bob=0.1788 | L_bob_nonce=0.0333 | L_eve=0.5870 | L_alice=0.2131
+Iter  90000 | Bob acc=0.8986 | Eve acc=0.6677 | Bob wrong-key acc=0.6123 | Bob wrong-nonce acc=0.5804 | Naive cipher acc=0.4875 | L_bob=0.1582 | L_bob_nonce=0.0243 | L_eve=0.5911 | L_alice=0.2065
+Iter 100000 | Bob acc=0.8915 | Eve acc=0.6581 | Bob wrong-key acc=0.5999 | Bob wrong-nonce acc=0.5842 | Naive cipher acc=0.4948 | L_bob=0.1797 | L_bob_nonce=0.0267 | L_eve=0.5953 | L_alice=0.2112
+[Fresh Eve Ensemble] Iter      1 | Bob acc=0.8865 | Bob wrong-key acc=0.5862 | Bob wrong-nonce acc=0.5690 | Fresh Eve mean acc=0.4986 | Fresh Eve best acc=0.5106
+[Fresh Eve Ensemble] Iter   5000 | Bob acc=0.8896 | Bob wrong-key acc=0.5823 | Bob wrong-nonce acc=0.5796 | Fresh Eve mean acc=0.6368 | Fresh Eve best acc=0.6749
+[Fresh Eve Ensemble] Iter  10000 | Bob acc=0.8867 | Bob wrong-key acc=0.6019 | Bob wrong-nonce acc=0.5762 | Fresh Eve mean acc=0.6622 | Fresh Eve best acc=0.6974
+[Fresh Eve Ensemble] Iter  15000 | Bob acc=0.8912 | Bob wrong-key acc=0.5944 | Bob wrong-nonce acc=0.5798 | Fresh Eve mean acc=0.6799 | Fresh Eve best acc=0.7135
+[Fresh Eve Ensemble] Iter  20000 | Bob acc=0.8958 | Bob wrong-key acc=0.6177 | Bob wrong-nonce acc=0.5710 | Fresh Eve mean acc=0.6913 | Fresh Eve best acc=0.7161
+
+=== FRESH EVE RESULTS FOR SEED 22 ===
+Eve#00 | init_seed=22000 | layers=2 | max_width=280 | hidden=[280, 56] | full=64 -> 280 -> 56 -> 32 | acc=0.659180 | hard_err=10.906250 | loss=0.601253
+Eve#01 | init_seed=22001 | layers=5 | max_width=750 | hidden=[489, 220, 750, 155, 699] | full=64 -> 489 -> 220 -> 750 -> 155 -> 699 -> 32 | acc=0.685547 | hard_err=10.062500 | loss=0.577782
+Eve#02 | init_seed=22002 | layers=3 | max_width=307 | hidden=[113, 269, 307] | full=64 -> 113 -> 269 -> 307 -> 32 | acc=0.672974 | hard_err=10.464844 | loss=0.585773
+Eve#03 | init_seed=22003 | layers=1 | max_width=359 | hidden=[359] | full=64 -> 359 -> 32 | acc=0.686890 | hard_err=10.019531 | loss=0.595151
+Eve#04 | init_seed=22004 | layers=5 | max_width=757 | hidden=[215, 597, 733, 472, 757] | full=64 -> 215 -> 597 -> 733 -> 472 -> 757 -> 32 | acc=0.696045 | hard_err=9.726562 | loss=0.556274
+Eve#05 | init_seed=22005 | layers=1 | max_width=622 | hidden=[622] | full=64 -> 622 -> 32 | acc=0.694580 | hard_err=9.773438 | loss=0.577322
+Eve#06 | init_seed=22006 | layers=1 | max_width=635 | hidden=[635] | full=64 -> 635 -> 32 | acc=0.696533 | hard_err=9.710938 | loss=0.575517
+Eve#07 | init_seed=22007 | layers=3 | max_width=463 | hidden=[350, 463, 226] | full=64 -> 350 -> 463 -> 226 -> 32 | acc=0.708740 | hard_err=9.320312 | loss=0.543937
+Eve#08 | init_seed=22008 | layers=2 | max_width=628 | hidden=[146, 628] | full=64 -> 146 -> 628 -> 32 | acc=0.704590 | hard_err=9.453125 | loss=0.549525
+Eve#09 | init_seed=22009 | layers=5 | max_width=747 | hidden=[611, 94, 747, 366, 659] | full=64 -> 611 -> 94 -> 747 -> 366 -> 659 -> 32 | acc=0.685303 | hard_err=10.070312 | loss=0.571526
+Eve#10 | init_seed=22010 | layers=3 | max_width=434 | hidden=[296, 220, 434] | full=64 -> 296 -> 220 -> 434 -> 32 | acc=0.700317 | hard_err=9.589844 | loss=0.553876
+Eve#11 | init_seed=22011 | layers=3 | max_width=698 | hidden=[698, 559, 177] | full=64 -> 698 -> 559 -> 177 -> 32 | acc=0.713623 | hard_err=9.164062 | loss=0.537913
+Eve#12 | init_seed=22012 | layers=3 | max_width=740 | hidden=[309, 715, 740] | full=64 -> 309 -> 715 -> 740 -> 32 | acc=0.711792 | hard_err=9.222656 | loss=0.536931
+Eve#13 | init_seed=22013 | layers=2 | max_width=474 | hidden=[474, 82] | full=64 -> 474 -> 82 -> 32 | acc=0.686157 | hard_err=10.042969 | loss=0.576060
+Eve#14 | init_seed=22014 | layers=3 | max_width=576 | hidden=[576, 65, 461] | full=64 -> 576 -> 65 -> 461 -> 32 | acc=0.707275 | hard_err=9.367188 | loss=0.551696
+Eve#15 | init_seed=22015 | layers=3 | max_width=561 | hidden=[550, 323, 561] | full=64 -> 550 -> 323 -> 561 -> 32 | acc=0.716064 | hard_err=9.085938 | loss=0.536809
+Eve#16 | init_seed=22016 | layers=4 | max_width=708 | hidden=[438, 708, 221, 346] | full=64 -> 438 -> 708 -> 221 -> 346 -> 32 | acc=0.698120 | hard_err=9.660156 | loss=0.557240
+Eve#17 | init_seed=22017 | layers=5 | max_width=628 | hidden=[414, 438, 628, 57, 336] | full=64 -> 414 -> 438 -> 628 -> 57 -> 336 -> 32 | acc=0.664551 | hard_err=10.734375 | loss=0.599575
+Eve#18 | init_seed=22018 | layers=5 | max_width=641 | hidden=[641, 606, 588, 571, 475] | full=64 -> 641 -> 606 -> 588 -> 571 -> 475 -> 32 | acc=0.703247 | hard_err=9.496094 | loss=0.554321
+Eve#19 | init_seed=22019 | layers=7 | max_width=721 | hidden=[721, 572, 469, 122, 124, 486, 396] | full=64 -> 721 -> 572 -> 469 -> 122 -> 124 -> 486 -> 396 -> 32 | acc=0.635132 | hard_err=11.675781 | loss=0.623857
+
+--- FRESH EVE SUMMARY ---
+fresh_eve_mean_acc:              0.691333
+fresh_eve_std_acc:               0.019939
+fresh_eve_best_acc:              0.716064
+fresh_eve_best_acc_id:           15
+fresh_eve_best_acc_seed:         22015
+fresh_eve_best_acc_arch:         [550, 323, 561]
+fresh_eve_best_acc_full_arch:    64 -> 550 -> 323 -> 561 -> 32
+fresh_eve_mean_hard_err:         9.877344
+fresh_eve_std_hard_err:          0.638062
+fresh_eve_best_hard_err:         9.085938
+fresh_eve_best_hard_err_id:      15
+fresh_eve_best_hard_err_seed:    22015
+fresh_eve_best_hard_err_arch:    [550, 323, 561]
+fresh_eve_best_hard_err_full_arch: 64 -> 550 -> 323 -> 561 -> 32
+
+--- FROZEN BOB CONSISTENCY CHECK ---
+Bob final acc during fresh-Eve eval:        0.895752
+Bob final hard err during fresh-Eve eval:   3.335938
+Bob wrong-key acc during fresh-Eve eval:    0.617676
+Bob wrong-nonce acc during fresh-Eve eval:  0.571045
+
+--- RUN RESULT ---
+seed:                    22
+bob_final_acc:           0.891479
+eve_final_acc:           0.658081
+bob_wrong_key_acc:       0.599854
+bob_wrong_nonce_acc:     0.584229
+naive_cipher_acc:        0.494751
+bob_final_hard_err:      3.472656
+eve_final_hard_err:      10.941406
+fresh_eve_mean_acc:          0.691333
+fresh_eve_best_acc:          0.716064
+fresh_eve_best_acc_arch:     64 -> 550 -> 323 -> 561 -> 32
+fresh_eve_mean_hard_err:     9.877344
+fresh_eve_best_hard_err:     9.085938
+fresh_eve_best_err_arch:     64 -> 550 -> 323 -> 561 -> 32
+bob_frozen_eval_acc:         0.895752
+bob_frozen_eval_wrong_key:   0.617676
+bob_frozen_eval_wrong_nonce: 0.571045
+
+============================================================
+RUN START | seed = 33
+============================================================
+Iter      1 | Bob acc=0.5032 | Eve acc=0.5004 | Bob wrong-key acc=0.5002 | Bob wrong-nonce acc=0.5023 | Naive cipher acc=0.5034 | L_bob=0.6936 | L_bob_nonce=0.0000 | L_eve=0.6933 | L_alice=0.6926
+Iter  10000 | Bob acc=0.8507 | Eve acc=0.4965 | Bob wrong-key acc=0.6348 | Bob wrong-nonce acc=0.5887 | Naive cipher acc=0.4928 | L_bob=0.2865 | L_bob_nonce=0.0258 | L_eve=0.6943 | L_alice=0.2842
+Iter  20000 | Bob acc=0.8947 | Eve acc=0.6659 | Bob wrong-key acc=0.6842 | Bob wrong-nonce acc=0.5735 | Naive cipher acc=0.4935 | L_bob=0.1926 | L_bob_nonce=0.0195 | L_eve=0.5761 | L_alice=0.2324
+Iter  30000 | Bob acc=0.9045 | Eve acc=0.6827 | Bob wrong-key acc=0.6775 | Bob wrong-nonce acc=0.5629 | Naive cipher acc=0.5024 | L_bob=0.1672 | L_bob_nonce=0.0145 | L_eve=0.5741 | L_alice=0.2075
+Iter  40000 | Bob acc=0.8873 | Eve acc=0.6710 | Bob wrong-key acc=0.6458 | Bob wrong-nonce acc=0.5598 | Naive cipher acc=0.5000 | L_bob=0.1994 | L_bob_nonce=0.0141 | L_eve=0.5922 | L_alice=0.2312
+Iter  50000 | Bob acc=0.9119 | Eve acc=0.6707 | Bob wrong-key acc=0.6593 | Bob wrong-nonce acc=0.5532 | Naive cipher acc=0.5063 | L_bob=0.1571 | L_bob_nonce=0.0119 | L_eve=0.5816 | L_alice=0.1841
+Iter  60000 | Bob acc=0.8989 | Eve acc=0.6620 | Bob wrong-key acc=0.6494 | Bob wrong-nonce acc=0.5687 | Naive cipher acc=0.5044 | L_bob=0.2020 | L_bob_nonce=0.0182 | L_eve=0.6036 | L_alice=0.2536
+Iter  70000 | Bob acc=0.8662 | Eve acc=0.6497 | Bob wrong-key acc=0.6467 | Bob wrong-nonce acc=0.5632 | Naive cipher acc=0.5028 | L_bob=0.2487 | L_bob_nonce=0.0150 | L_eve=0.6146 | L_alice=0.2718
+Iter  80000 | Bob acc=0.9104 | Eve acc=0.6849 | Bob wrong-key acc=0.6150 | Bob wrong-nonce acc=0.5660 | Naive cipher acc=0.4950 | L_bob=0.1443 | L_bob_nonce=0.0179 | L_eve=0.5837 | L_alice=0.1853
+Iter  90000 | Bob acc=0.8853 | Eve acc=0.6605 | Bob wrong-key acc=0.6176 | Bob wrong-nonce acc=0.5728 | Naive cipher acc=0.4894 | L_bob=0.2048 | L_bob_nonce=0.0205 | L_eve=0.6052 | L_alice=0.2277
+Iter 100000 | Bob acc=0.9067 | Eve acc=0.6798 | Bob wrong-key acc=0.5824 | Bob wrong-nonce acc=0.5538 | Naive cipher acc=0.5046 | L_bob=0.1563 | L_bob_nonce=0.0109 | L_eve=0.5836 | L_alice=0.1956
+[Fresh Eve Ensemble] Iter      1 | Bob acc=0.9064 | Bob wrong-key acc=0.5983 | Bob wrong-nonce acc=0.5546 | Fresh Eve mean acc=0.4997 | Fresh Eve best acc=0.5121
+[Fresh Eve Ensemble] Iter   5000 | Bob acc=0.9060 | Bob wrong-key acc=0.5913 | Bob wrong-nonce acc=0.5667 | Fresh Eve mean acc=0.6296 | Fresh Eve best acc=0.6926
+[Fresh Eve Ensemble] Iter  10000 | Bob acc=0.9061 | Bob wrong-key acc=0.5854 | Bob wrong-nonce acc=0.5657 | Fresh Eve mean acc=0.6565 | Fresh Eve best acc=0.7159
+[Fresh Eve Ensemble] Iter  15000 | Bob acc=0.9125 | Bob wrong-key acc=0.5835 | Bob wrong-nonce acc=0.5543 | Fresh Eve mean acc=0.6726 | Fresh Eve best acc=0.7228
+[Fresh Eve Ensemble] Iter  20000 | Bob acc=0.9114 | Bob wrong-key acc=0.5905 | Bob wrong-nonce acc=0.5638 | Fresh Eve mean acc=0.6911 | Fresh Eve best acc=0.7410
+
+=== FRESH EVE RESULTS FOR SEED 33 ===
+Eve#00 | init_seed=33000 | layers=5 | max_width=679 | hidden=[203, 679, 270, 315, 522] | full=64 -> 203 -> 679 -> 270 -> 315 -> 522 -> 32 | acc=0.696899 | hard_err=9.699219 | loss=0.559109
+Eve#01 | init_seed=33001 | layers=6 | max_width=699 | hidden=[577, 572, 222, 699, 663, 547] | full=64 -> 577 -> 572 -> 222 -> 699 -> 663 -> 547 -> 32 | acc=0.694336 | hard_err=9.781250 | loss=0.558299
+Eve#02 | init_seed=33002 | layers=3 | max_width=735 | hidden=[735, 572, 524] | full=64 -> 735 -> 572 -> 524 -> 32 | acc=0.740967 | hard_err=8.289062 | loss=0.496537
+Eve#03 | init_seed=33003 | layers=4 | max_width=721 | hidden=[320, 721, 682, 104] | full=64 -> 320 -> 721 -> 682 -> 104 -> 32 | acc=0.698486 | hard_err=9.648438 | loss=0.555989
+Eve#04 | init_seed=33004 | layers=3 | max_width=562 | hidden=[455, 348, 562] | full=64 -> 455 -> 348 -> 562 -> 32 | acc=0.730591 | hard_err=8.621094 | loss=0.515181
+Eve#05 | init_seed=33005 | layers=4 | max_width=725 | hidden=[85, 654, 725, 468] | full=64 -> 85 -> 654 -> 725 -> 468 -> 32 | acc=0.712646 | hard_err=9.195312 | loss=0.538037
+Eve#06 | init_seed=33006 | layers=7 | max_width=729 | hidden=[319, 359, 600, 729, 283, 152, 89] | full=64 -> 319 -> 359 -> 600 -> 729 -> 283 -> 152 -> 89 -> 32 | acc=0.627197 | hard_err=11.929688 | loss=0.629395
+Eve#07 | init_seed=33007 | layers=3 | max_width=323 | hidden=[323, 250, 99] | full=64 -> 323 -> 250 -> 99 -> 32 | acc=0.700928 | hard_err=9.570312 | loss=0.554810
+Eve#08 | init_seed=33008 | layers=6 | max_width=701 | hidden=[406, 158, 701, 361, 280, 557] | full=64 -> 406 -> 158 -> 701 -> 361 -> 280 -> 557 -> 32 | acc=0.673584 | hard_err=10.445312 | loss=0.584674
+Eve#09 | init_seed=33009 | layers=3 | max_width=394 | hidden=[359, 38, 394] | full=64 -> 359 -> 38 -> 394 -> 32 | acc=0.683228 | hard_err=10.136719 | loss=0.571503
+Eve#10 | init_seed=33010 | layers=5 | max_width=706 | hidden=[706, 343, 600, 435, 430] | full=64 -> 706 -> 343 -> 600 -> 435 -> 430 -> 32 | acc=0.707520 | hard_err=9.359375 | loss=0.544308
+Eve#11 | init_seed=33011 | layers=2 | max_width=735 | hidden=[735, 144] | full=64 -> 735 -> 144 -> 32 | acc=0.721436 | hard_err=8.914062 | loss=0.527693
+Eve#12 | init_seed=33012 | layers=1 | max_width=405 | hidden=[405] | full=64 -> 405 -> 32 | acc=0.695190 | hard_err=9.753906 | loss=0.577192
+Eve#13 | init_seed=33013 | layers=7 | max_width=731 | hidden=[674, 731, 605, 158, 96, 184, 127] | full=64 -> 674 -> 731 -> 605 -> 158 -> 96 -> 184 -> 127 -> 32 | acc=0.628906 | hard_err=11.875000 | loss=0.625429
+Eve#14 | init_seed=33014 | layers=1 | max_width=356 | hidden=[356] | full=64 -> 356 -> 32 | acc=0.690063 | hard_err=9.917969 | loss=0.581779
+Eve#15 | init_seed=33015 | layers=1 | max_width= 90 | hidden=[90] | full=64 -> 90 -> 32 | acc=0.651001 | hard_err=11.167969 | loss=0.628272
+Eve#16 | init_seed=33016 | layers=4 | max_width=388 | hidden=[314, 388, 239, 229] | full=64 -> 314 -> 388 -> 239 -> 229 -> 32 | acc=0.693115 | hard_err=9.820312 | loss=0.561262
+Eve#17 | init_seed=33017 | layers=6 | max_width=701 | hidden=[701, 429, 500, 644, 516, 398] | full=64 -> 701 -> 429 -> 500 -> 644 -> 516 -> 398 -> 32 | acc=0.684937 | hard_err=10.082031 | loss=0.565340
+Eve#18 | init_seed=33018 | layers=5 | max_width=583 | hidden=[583, 497, 347, 529, 103] | full=64 -> 583 -> 497 -> 347 -> 529 -> 103 -> 32 | acc=0.688477 | hard_err=9.968750 | loss=0.567811
+Eve#19 | init_seed=33019 | layers=1 | max_width=524 | hidden=[524] | full=64 -> 524 -> 32 | acc=0.702759 | hard_err=9.511719 | loss=0.568277
+
+--- FRESH EVE SUMMARY ---
+fresh_eve_mean_acc:              0.691113
+fresh_eve_std_acc:               0.028308
+fresh_eve_best_acc:              0.740967
+fresh_eve_best_acc_id:           2
+fresh_eve_best_acc_seed:         33002
+fresh_eve_best_acc_arch:         [735, 572, 524]
+fresh_eve_best_acc_full_arch:    64 -> 735 -> 572 -> 524 -> 32
+fresh_eve_mean_hard_err:         9.884375
+fresh_eve_std_hard_err:          0.905848
+fresh_eve_best_hard_err:         8.289062
+fresh_eve_best_hard_err_id:      2
+fresh_eve_best_hard_err_seed:    33002
+fresh_eve_best_hard_err_arch:    [735, 572, 524]
+fresh_eve_best_hard_err_full_arch: 64 -> 735 -> 572 -> 524 -> 32
+
+--- FROZEN BOB CONSISTENCY CHECK ---
+Bob final acc during fresh-Eve eval:        0.911377
+Bob final hard err during fresh-Eve eval:   2.835938
+Bob wrong-key acc during fresh-Eve eval:    0.590454
+Bob wrong-nonce acc during fresh-Eve eval:  0.563843
+
+--- RUN RESULT ---
+seed:                    33
+bob_final_acc:           0.906738
+eve_final_acc:           0.679810
+bob_wrong_key_acc:       0.582397
+bob_wrong_nonce_acc:     0.553833
+naive_cipher_acc:        0.504639
+bob_final_hard_err:      2.984375
+eve_final_hard_err:      10.246094
+fresh_eve_mean_acc:          0.691113
+fresh_eve_best_acc:          0.740967
+fresh_eve_best_acc_arch:     64 -> 735 -> 572 -> 524 -> 32
+fresh_eve_mean_hard_err:     9.884375
+fresh_eve_best_hard_err:     8.289062
+fresh_eve_best_err_arch:     64 -> 735 -> 572 -> 524 -> 32
+bob_frozen_eval_acc:         0.911377
+bob_frozen_eval_wrong_key:   0.590454
+bob_frozen_eval_wrong_nonce: 0.563843
+
+============================================================
+RUN START | seed = 44
+============================================================
+Iter      1 | Bob acc=0.4827 | Eve acc=0.5023 | Bob wrong-key acc=0.4856 | Bob wrong-nonce acc=0.4825 | Naive cipher acc=0.5054 | L_bob=0.6955 | L_bob_nonce=0.0000 | L_eve=0.6942 | L_alice=0.6927
+Iter  10000 | Bob acc=0.8519 | Eve acc=0.4926 | Bob wrong-key acc=0.6998 | Bob wrong-nonce acc=0.5909 | Naive cipher acc=0.4996 | L_bob=0.2712 | L_bob_nonce=0.0290 | L_eve=0.6944 | L_alice=0.2803
+Iter  20000 | Bob acc=0.8617 | Eve acc=0.6681 | Bob wrong-key acc=0.6814 | Bob wrong-nonce acc=0.5778 | Naive cipher acc=0.5006 | L_bob=0.2312 | L_bob_nonce=0.0223 | L_eve=0.5792 | L_alice=0.2704
+Iter  30000 | Bob acc=0.8904 | Eve acc=0.6736 | Bob wrong-key acc=0.6796 | Bob wrong-nonce acc=0.5889 | Naive cipher acc=0.5052 | L_bob=0.1992 | L_bob_nonce=0.0295 | L_eve=0.5758 | L_alice=0.2380
+Iter  40000 | Bob acc=0.8906 | Eve acc=0.6776 | Bob wrong-key acc=0.6171 | Bob wrong-nonce acc=0.5691 | Naive cipher acc=0.5002 | L_bob=0.1920 | L_bob_nonce=0.0180 | L_eve=0.5867 | L_alice=0.2296
+Iter  50000 | Bob acc=0.8892 | Eve acc=0.6804 | Bob wrong-key acc=0.6072 | Bob wrong-nonce acc=0.5525 | Naive cipher acc=0.4946 | L_bob=0.1979 | L_bob_nonce=0.0105 | L_eve=0.5828 | L_alice=0.2090
+Iter  60000 | Bob acc=0.8934 | Eve acc=0.6722 | Bob wrong-key acc=0.5811 | Bob wrong-nonce acc=0.5444 | Naive cipher acc=0.4985 | L_bob=0.1716 | L_bob_nonce=0.0084 | L_eve=0.5869 | L_alice=0.2063
+Iter  70000 | Bob acc=0.9131 | Eve acc=0.6798 | Bob wrong-key acc=0.5962 | Bob wrong-nonce acc=0.5702 | Naive cipher acc=0.4935 | L_bob=0.1443 | L_bob_nonce=0.0190 | L_eve=0.5781 | L_alice=0.1906
+Iter  80000 | Bob acc=0.9076 | Eve acc=0.6688 | Bob wrong-key acc=0.5657 | Bob wrong-nonce acc=0.5431 | Naive cipher acc=0.4874 | L_bob=0.1447 | L_bob_nonce=0.0070 | L_eve=0.5855 | L_alice=0.1778
+Iter  90000 | Bob acc=0.9037 | Eve acc=0.6709 | Bob wrong-key acc=0.5740 | Bob wrong-nonce acc=0.5612 | Naive cipher acc=0.4965 | L_bob=0.1715 | L_bob_nonce=0.0143 | L_eve=0.5933 | L_alice=0.2135
+Iter 100000 | Bob acc=0.8999 | Eve acc=0.6625 | Bob wrong-key acc=0.5627 | Bob wrong-nonce acc=0.5576 | Naive cipher acc=0.4963 | L_bob=0.1743 | L_bob_nonce=0.0138 | L_eve=0.6014 | L_alice=0.1906
+[Fresh Eve Ensemble] Iter      1 | Bob acc=0.9020 | Bob wrong-key acc=0.5807 | Bob wrong-nonce acc=0.5673 | Fresh Eve mean acc=0.4992 | Fresh Eve best acc=0.5114
+[Fresh Eve Ensemble] Iter   5000 | Bob acc=0.9011 | Bob wrong-key acc=0.5662 | Bob wrong-nonce acc=0.5573 | Fresh Eve mean acc=0.6165 | Fresh Eve best acc=0.6742
+[Fresh Eve Ensemble] Iter  10000 | Bob acc=0.9023 | Bob wrong-key acc=0.5604 | Bob wrong-nonce acc=0.5536 | Fresh Eve mean acc=0.6442 | Fresh Eve best acc=0.7007
+[Fresh Eve Ensemble] Iter  15000 | Bob acc=0.9061 | Bob wrong-key acc=0.5560 | Bob wrong-nonce acc=0.5564 | Fresh Eve mean acc=0.6549 | Fresh Eve best acc=0.7053
+[Fresh Eve Ensemble] Iter  20000 | Bob acc=0.9000 | Bob wrong-key acc=0.5549 | Bob wrong-nonce acc=0.5387 | Fresh Eve mean acc=0.6652 | Fresh Eve best acc=0.7113
+
+=== FRESH EVE RESULTS FOR SEED 44 ===
+Eve#00 | init_seed=44000 | layers=4 | max_width=750 | hidden=[564, 586, 750, 151] | full=64 -> 564 -> 586 -> 750 -> 151 -> 32 | acc=0.705322 | hard_err=9.429688 | loss=0.548057
+Eve#01 | init_seed=44001 | layers=2 | max_width=420 | hidden=[420, 262] | full=64 -> 420 -> 262 -> 32 | acc=0.695801 | hard_err=9.734375 | loss=0.562318
+Eve#02 | init_seed=44002 | layers=3 | max_width=262 | hidden=[61, 262, 151] | full=64 -> 61 -> 262 -> 151 -> 32 | acc=0.654419 | hard_err=11.058594 | loss=0.610682
+Eve#03 | init_seed=44003 | layers=5 | max_width=737 | hidden=[41, 134, 192, 558, 737] | full=64 -> 41 -> 134 -> 192 -> 558 -> 737 -> 32 | acc=0.629395 | hard_err=11.859375 | loss=0.626043
+Eve#04 | init_seed=44004 | layers=3 | max_width=742 | hidden=[742, 681, 419] | full=64 -> 742 -> 681 -> 419 -> 32 | acc=0.711304 | hard_err=9.238281 | loss=0.543607
+Eve#05 | init_seed=44005 | layers=5 | max_width=739 | hidden=[446, 739, 718, 365, 398] | full=64 -> 446 -> 739 -> 718 -> 365 -> 398 -> 32 | acc=0.700562 | hard_err=9.582031 | loss=0.559159
+Eve#06 | init_seed=44006 | layers=1 | max_width=378 | hidden=[378] | full=64 -> 378 -> 32 | acc=0.677734 | hard_err=10.312500 | loss=0.589557
+Eve#07 | init_seed=44007 | layers=7 | max_width=664 | hidden=[321, 664, 194, 146, 555, 103, 634] | full=64 -> 321 -> 664 -> 194 -> 146 -> 555 -> 103 -> 634 -> 32 | acc=0.601562 | hard_err=12.750000 | loss=0.639186
+Eve#08 | init_seed=44008 | layers=1 | max_width=308 | hidden=[308] | full=64 -> 308 -> 32 | acc=0.673218 | hard_err=10.457031 | loss=0.594293
+Eve#09 | init_seed=44009 | layers=3 | max_width=672 | hidden=[142, 672, 328] | full=64 -> 142 -> 672 -> 328 -> 32 | acc=0.696533 | hard_err=9.710938 | loss=0.559622
+Eve#10 | init_seed=44010 | layers=1 | max_width=384 | hidden=[384] | full=64 -> 384 -> 32 | acc=0.677490 | hard_err=10.320312 | loss=0.590374
+Eve#11 | init_seed=44011 | layers=4 | max_width=520 | hidden=[130, 520, 519, 227] | full=64 -> 130 -> 520 -> 519 -> 227 -> 32 | acc=0.677368 | hard_err=10.324219 | loss=0.579924
+Eve#12 | init_seed=44012 | layers=2 | max_width=296 | hidden=[165, 296] | full=64 -> 165 -> 296 -> 32 | acc=0.691040 | hard_err=9.886719 | loss=0.572476
+Eve#13 | init_seed=44013 | layers=6 | max_width=728 | hidden=[285, 82, 76, 721, 728, 478] | full=64 -> 285 -> 82 -> 76 -> 721 -> 728 -> 478 -> 32 | acc=0.637451 | hard_err=11.601562 | loss=0.613462
+Eve#14 | init_seed=44014 | layers=6 | max_width=762 | hidden=[70, 762, 743, 701, 368, 410] | full=64 -> 70 -> 762 -> 743 -> 701 -> 368 -> 410 -> 32 | acc=0.649292 | hard_err=11.222656 | loss=0.609450
+Eve#15 | init_seed=44015 | layers=7 | max_width=677 | hidden=[514, 677, 496, 636, 585, 186, 270] | full=64 -> 514 -> 677 -> 496 -> 636 -> 585 -> 186 -> 270 -> 32 | acc=0.609741 | hard_err=12.488281 | loss=0.629922
+Eve#16 | init_seed=44016 | layers=4 | max_width=732 | hidden=[498, 732, 386, 663] | full=64 -> 498 -> 732 -> 386 -> 663 -> 32 | acc=0.709717 | hard_err=9.289062 | loss=0.543115
+Eve#17 | init_seed=44017 | layers=7 | max_width=625 | hidden=[76, 316, 193, 41, 260, 46, 625] | full=64 -> 76 -> 316 -> 193 -> 41 -> 260 -> 46 -> 625 -> 32 | acc=0.581177 | hard_err=13.402344 | loss=0.659340
+Eve#18 | init_seed=44018 | layers=7 | max_width=694 | hidden=[650, 694, 601, 588, 320, 397, 609] | full=64 -> 650 -> 694 -> 601 -> 588 -> 320 -> 397 -> 609 -> 32 | acc=0.633789 | hard_err=11.718750 | loss=0.621139
+Eve#19 | init_seed=44019 | layers=2 | max_width=446 | hidden=[446, 146] | full=64 -> 446 -> 146 -> 32 | acc=0.690552 | hard_err=9.902344 | loss=0.568321
+
+--- FRESH EVE SUMMARY ---
+fresh_eve_mean_acc:              0.665173
+fresh_eve_std_acc:               0.037623
+fresh_eve_best_acc:              0.711304
+fresh_eve_best_acc_id:           4
+fresh_eve_best_acc_seed:         44004
+fresh_eve_best_acc_arch:         [742, 681, 419]
+fresh_eve_best_acc_full_arch:    64 -> 742 -> 681 -> 419 -> 32
+fresh_eve_mean_hard_err:         10.714453
+fresh_eve_std_hard_err:          1.203938
+fresh_eve_best_hard_err:         9.238281
+fresh_eve_best_hard_err_id:      4
+fresh_eve_best_hard_err_seed:    44004
+fresh_eve_best_hard_err_arch:    [742, 681, 419]
+fresh_eve_best_hard_err_full_arch: 64 -> 742 -> 681 -> 419 -> 32
+
+--- FROZEN BOB CONSISTENCY CHECK ---
+Bob final acc during fresh-Eve eval:        0.900024
+Bob final hard err during fresh-Eve eval:   3.199219
+Bob wrong-key acc during fresh-Eve eval:    0.554932
+Bob wrong-nonce acc during fresh-Eve eval:  0.538696
+
+--- RUN RESULT ---
+seed:                    44
+bob_final_acc:           0.899902
+eve_final_acc:           0.662476
+bob_wrong_key_acc:       0.562744
+bob_wrong_nonce_acc:     0.557617
+naive_cipher_acc:        0.496338
+bob_final_hard_err:      3.203125
+eve_final_hard_err:      10.800781
+fresh_eve_mean_acc:          0.665173
+fresh_eve_best_acc:          0.711304
+fresh_eve_best_acc_arch:     64 -> 742 -> 681 -> 419 -> 32
+fresh_eve_mean_hard_err:     10.714453
+fresh_eve_best_hard_err:     9.238281
+fresh_eve_best_err_arch:     64 -> 742 -> 681 -> 419 -> 32
+bob_frozen_eval_acc:         0.900024
+bob_frozen_eval_wrong_key:   0.554932
+bob_frozen_eval_wrong_nonce: 0.538696
+
+============================================================
+RUN START | seed = 55
+============================================================
+Iter      1 | Bob acc=0.5114 | Eve acc=0.5034 | Bob wrong-key acc=0.5134 | Bob wrong-nonce acc=0.5118 | Naive cipher acc=0.4993 | L_bob=0.6930 | L_bob_nonce=0.0000 | L_eve=0.6933 | L_alice=0.6935
+Iter  10000 | Bob acc=0.8513 | Eve acc=0.4989 | Bob wrong-key acc=0.6575 | Bob wrong-nonce acc=0.5757 | Naive cipher acc=0.4916 | L_bob=0.2732 | L_bob_nonce=0.0222 | L_eve=0.6938 | L_alice=0.2759
+Iter  20000 | Bob acc=0.8705 | Eve acc=0.6555 | Bob wrong-key acc=0.6591 | Bob wrong-nonce acc=0.5620 | Naive cipher acc=0.5057 | L_bob=0.2296 | L_bob_nonce=0.0158 | L_eve=0.5827 | L_alice=0.2834
+Iter  30000 | Bob acc=0.8849 | Eve acc=0.6790 | Bob wrong-key acc=0.6553 | Bob wrong-nonce acc=0.5590 | Naive cipher acc=0.5125 | L_bob=0.1949 | L_bob_nonce=0.0130 | L_eve=0.5750 | L_alice=0.2285
+Iter  40000 | Bob acc=0.8783 | Eve acc=0.6587 | Bob wrong-key acc=0.6764 | Bob wrong-nonce acc=0.5834 | Naive cipher acc=0.5010 | L_bob=0.2221 | L_bob_nonce=0.0258 | L_eve=0.6017 | L_alice=0.2490
+Iter  50000 | Bob acc=0.9022 | Eve acc=0.6729 | Bob wrong-key acc=0.6636 | Bob wrong-nonce acc=0.5577 | Naive cipher acc=0.4937 | L_bob=0.1785 | L_bob_nonce=0.0122 | L_eve=0.5804 | L_alice=0.2168
+Iter  60000 | Bob acc=0.8551 | Eve acc=0.6549 | Bob wrong-key acc=0.6370 | Bob wrong-nonce acc=0.5646 | Naive cipher acc=0.4987 | L_bob=0.2796 | L_bob_nonce=0.0162 | L_eve=0.6054 | L_alice=0.2790
+Iter  70000 | Bob acc=0.8951 | Eve acc=0.6667 | Bob wrong-key acc=0.6011 | Bob wrong-nonce acc=0.5619 | Naive cipher acc=0.5018 | L_bob=0.1844 | L_bob_nonce=0.0154 | L_eve=0.5888 | L_alice=0.2145
+Iter  80000 | Bob acc=0.9064 | Eve acc=0.6694 | Bob wrong-key acc=0.6447 | Bob wrong-nonce acc=0.5847 | Naive cipher acc=0.4978 | L_bob=0.1880 | L_bob_nonce=0.0266 | L_eve=0.5923 | L_alice=0.2062
+Iter  90000 | Bob acc=0.9010 | Eve acc=0.6573 | Bob wrong-key acc=0.6226 | Bob wrong-nonce acc=0.5751 | Naive cipher acc=0.5057 | L_bob=0.2000 | L_bob_nonce=0.0214 | L_eve=0.6082 | L_alice=0.2302
+Iter 100000 | Bob acc=0.9058 | Eve acc=0.6689 | Bob wrong-key acc=0.5961 | Bob wrong-nonce acc=0.5651 | Naive cipher acc=0.4993 | L_bob=0.1653 | L_bob_nonce=0.0166 | L_eve=0.5946 | L_alice=0.1929
+[Fresh Eve Ensemble] Iter      1 | Bob acc=0.9028 | Bob wrong-key acc=0.5983 | Bob wrong-nonce acc=0.5701 | Fresh Eve mean acc=0.4997 | Fresh Eve best acc=0.5171
+[Fresh Eve Ensemble] Iter   5000 | Bob acc=0.9078 | Bob wrong-key acc=0.5806 | Bob wrong-nonce acc=0.5465 | Fresh Eve mean acc=0.6216 | Fresh Eve best acc=0.6942
+[Fresh Eve Ensemble] Iter  10000 | Bob acc=0.9092 | Bob wrong-key acc=0.5906 | Bob wrong-nonce acc=0.5558 | Fresh Eve mean acc=0.6383 | Fresh Eve best acc=0.7119
+[Fresh Eve Ensemble] Iter  15000 | Bob acc=0.9050 | Bob wrong-key acc=0.5811 | Bob wrong-nonce acc=0.5682 | Fresh Eve mean acc=0.6624 | Fresh Eve best acc=0.7339
+[Fresh Eve Ensemble] Iter  20000 | Bob acc=0.9081 | Bob wrong-key acc=0.5963 | Bob wrong-nonce acc=0.5540 | Fresh Eve mean acc=0.6711 | Fresh Eve best acc=0.7360
+
+=== FRESH EVE RESULTS FOR SEED 55 ===
+Eve#00 | init_seed=55000 | layers=1 | max_width=232 | hidden=[232] | full=64 -> 232 -> 32 | acc=0.665283 | hard_err=10.710938 | loss=0.609534
+Eve#01 | init_seed=55001 | layers=2 | max_width=341 | hidden=[341, 113] | full=64 -> 341 -> 113 -> 32 | acc=0.691650 | hard_err=9.867188 | loss=0.570421
+Eve#02 | init_seed=55002 | layers=6 | max_width=710 | hidden=[220, 341, 122, 392, 710, 515] | full=64 -> 220 -> 341 -> 122 -> 392 -> 710 -> 515 -> 32 | acc=0.651855 | hard_err=11.140625 | loss=0.596133
+Eve#03 | init_seed=55003 | layers=5 | max_width=547 | hidden=[426, 429, 547, 447, 357] | full=64 -> 426 -> 429 -> 547 -> 447 -> 357 -> 32 | acc=0.683960 | hard_err=10.113281 | loss=0.565392
+Eve#04 | init_seed=55004 | layers=6 | max_width=679 | hidden=[471, 579, 678, 73, 679, 295] | full=64 -> 471 -> 579 -> 678 -> 73 -> 679 -> 295 -> 32 | acc=0.651367 | hard_err=11.156250 | loss=0.599627
+Eve#05 | init_seed=55005 | layers=1 | max_width=268 | hidden=[268] | full=64 -> 268 -> 32 | acc=0.672241 | hard_err=10.488281 | loss=0.604764
+Eve#06 | init_seed=55006 | layers=5 | max_width=754 | hidden=[754, 46, 616, 507, 261] | full=64 -> 754 -> 46 -> 616 -> 507 -> 261 -> 32 | acc=0.668213 | hard_err=10.617188 | loss=0.584142
+Eve#07 | init_seed=55007 | layers=1 | max_width=419 | hidden=[419] | full=64 -> 419 -> 32 | acc=0.681396 | hard_err=10.195312 | loss=0.588511
+Eve#08 | init_seed=55008 | layers=2 | max_width=546 | hidden=[122, 546] | full=64 -> 122 -> 546 -> 32 | acc=0.697510 | hard_err=9.679688 | loss=0.555027
+Eve#09 | init_seed=55009 | layers=6 | max_width=470 | hidden=[470, 231, 264, 242, 452, 206] | full=64 -> 470 -> 231 -> 264 -> 242 -> 452 -> 206 -> 32 | acc=0.626587 | hard_err=11.949219 | loss=0.624573
+Eve#10 | init_seed=55010 | layers=3 | max_width=370 | hidden=[370, 40, 141] | full=64 -> 370 -> 40 -> 141 -> 32 | acc=0.662598 | hard_err=10.796875 | loss=0.596789
+Eve#11 | init_seed=55011 | layers=7 | max_width=665 | hidden=[452, 349, 364, 402, 665, 239, 278] | full=64 -> 452 -> 349 -> 364 -> 402 -> 665 -> 239 -> 278 -> 32 | acc=0.621704 | hard_err=12.105469 | loss=0.630337
+Eve#12 | init_seed=55012 | layers=4 | max_width=348 | hidden=[211, 200, 258, 348] | full=64 -> 211 -> 200 -> 258 -> 348 -> 32 | acc=0.673950 | hard_err=10.433594 | loss=0.576446
+Eve#13 | init_seed=55013 | layers=5 | max_width=683 | hidden=[197, 482, 246, 340, 683] | full=64 -> 197 -> 482 -> 246 -> 340 -> 683 -> 32 | acc=0.675903 | hard_err=10.371094 | loss=0.576751
+Eve#14 | init_seed=55014 | layers=2 | max_width=767 | hidden=[746, 767] | full=64 -> 746 -> 767 -> 32 | acc=0.735962 | hard_err=8.449219 | loss=0.496579
+Eve#15 | init_seed=55015 | layers=4 | max_width=649 | hidden=[512, 631, 649, 141] | full=64 -> 512 -> 631 -> 649 -> 141 -> 32 | acc=0.699463 | hard_err=9.617188 | loss=0.548088
+Eve#16 | init_seed=55016 | layers=4 | max_width=705 | hidden=[705, 112, 292, 89] | full=64 -> 705 -> 112 -> 292 -> 89 -> 32 | acc=0.662354 | hard_err=10.804688 | loss=0.588328
+Eve#17 | init_seed=55017 | layers=7 | max_width=749 | hidden=[749, 747, 298, 337, 353, 308, 160] | full=64 -> 749 -> 747 -> 298 -> 337 -> 353 -> 308 -> 160 -> 32 | acc=0.608276 | hard_err=12.535156 | loss=0.641717
+Eve#18 | init_seed=55018 | layers=1 | max_width=646 | hidden=[646] | full=64 -> 646 -> 32 | acc=0.696411 | hard_err=9.714844 | loss=0.573534
+Eve#19 | init_seed=55019 | layers=4 | max_width=540 | hidden=[494, 540, 530, 102] | full=64 -> 494 -> 540 -> 530 -> 102 -> 32 | acc=0.694824 | hard_err=9.765625 | loss=0.550851
+
+--- FRESH EVE SUMMARY ---
+fresh_eve_mean_acc:              0.671075
+fresh_eve_std_acc:               0.029118
+fresh_eve_best_acc:              0.735962
+fresh_eve_best_acc_id:           14
+fresh_eve_best_acc_seed:         55014
+fresh_eve_best_acc_arch:         [746, 767]
+fresh_eve_best_acc_full_arch:    64 -> 746 -> 767 -> 32
+fresh_eve_mean_hard_err:         10.525586
+fresh_eve_std_hard_err:          0.931787
+fresh_eve_best_hard_err:         8.449219
+fresh_eve_best_hard_err_id:      14
+fresh_eve_best_hard_err_seed:    55014
+fresh_eve_best_hard_err_arch:    [746, 767]
+fresh_eve_best_hard_err_full_arch: 64 -> 746 -> 767 -> 32
+
+--- FROZEN BOB CONSISTENCY CHECK ---
+Bob final acc during fresh-Eve eval:        0.908081
+Bob final hard err during fresh-Eve eval:   2.941406
+Bob wrong-key acc during fresh-Eve eval:    0.596313
+Bob wrong-nonce acc during fresh-Eve eval:  0.553955
+
+--- RUN RESULT ---
+seed:                    55
+bob_final_acc:           0.905762
+eve_final_acc:           0.668945
+bob_wrong_key_acc:       0.596069
+bob_wrong_nonce_acc:     0.565063
+naive_cipher_acc:        0.499268
+bob_final_hard_err:      3.015625
+eve_final_hard_err:      10.593750
+fresh_eve_mean_acc:          0.671075
+fresh_eve_best_acc:          0.735962
+fresh_eve_best_acc_arch:     64 -> 746 -> 767 -> 32
+fresh_eve_mean_hard_err:     10.525586
+fresh_eve_best_hard_err:     8.449219
+fresh_eve_best_err_arch:     64 -> 746 -> 767 -> 32
+bob_frozen_eval_acc:         0.908081
+bob_frozen_eval_wrong_key:   0.596313
+bob_frozen_eval_wrong_nonce: 0.553955
+
+MESSAGE:      [[0 1 0 0 0 0 1 0 0 1 1 0 1 1 0 0 1 0 0 1 1 0 1 1 1 1 1 0 1 0 1 1]]
+KEY:          [[1 1 1 0 0 1 1 1 0 1 1 1 1 0 1 1 0 1 1 1 1 1 1 0 0 1 1 0 1 0 1 1]]
+NONCE:        [[0 0 1 1 0 0 0 1 1 1 1 0 1 0 0 0 0 1 1 0 1 0 0 0 0 1 1 0 1 0 1 1]]
+CIPHER RAW:   [[-0.79306144  0.7179137  -0.75560933  0.8932143  -0.26429814  0.85643613
+  -0.33901152  0.79103726  0.752409   -0.8733525   0.7548114   0.9387874
+   0.36420172 -0.8290434   0.77087253  0.4686581  -0.24081278 -0.82337403
+  -0.5242781   0.9257617   0.21579714  0.8344762  -0.8668653  -0.6524997
+   0.8065182  -0.6980823   0.59351724  0.7510629   0.38222876  0.59784836
+   0.54169446 -0.740081  ]]
+CIPHER SIGN:  [[0 1 0 1 0 1 0 1 1 0 1 1 1 0 1 1 0 0 0 1 1 1 0 0 1 0 1 1 1 1 1 0]]
+BOB OUT:      [[0 1 1 0 0 0 1 0 0 1 1 0 1 1 0 0 1 0 0 0 1 1 1 1 1 1 1 0 1 0 1 0]]
+EVE OUT:      [[0 0 1 0 0 0 0 0 0 1 0 1 1 1 1 1 1 1 0 1 0 0 1 1 1 1 0 1 0 1 1 1]]
+
+FIXED MESSAGE: [[0 1 1 0 0 1 1 1 1 0 0 0 0 1 0 1 1 1 1 0 1 1 1 1 0 0 1 0 1 0 0 0]]
+FIXED KEY:     [[1 1 0 0 0 0 1 1 1 0 1 0 0 0 0 1 0 1 1 1 0 0 1 0 0 0 0 1 0 1 1 1]]
+
+--- TRIAL 1 ---
+NONCE:        [[1 0 0 0 0 0 0 0 1 0 1 1 0 0 1 0 1 1 0 0 0 0 1 1 1 0 0 1 0 1 1 1]]
+CIPHER RAW:   [[-0.64899135  0.6383886  -0.6541589   0.83459944 -0.22638671  0.721019
+  -0.03926043  0.71388686  0.6724621  -0.81359684  0.63155186  0.8937413
+   0.3648778  -0.7213503   0.71900266  0.47552192 -0.28442588 -0.70868737
+  -0.49322027  0.8616145   0.10862963  0.7538207  -0.75530624 -0.5792966
+   0.76101077 -0.53189677  0.52532965  0.6797369   0.31585154  0.5588412
+   0.49377435 -0.6601844 ]]
+CIPHER SIGN:  [[0 1 0 1 0 1 0 1 1 0 1 1 1 0 1 1 0 0 0 1 1 1 0 0 1 0 1 1 1 1 1 0]]
+BOB OUT:      [[1 0 0 0 0 1 1 1 1 0 0 0 0 1 0 1 1 1 1 0 1 1 1 1 0 0 1 0 1 0 0 0]]
+EVE OUT:      [[0 1 0 0 0 1 1 1 1 1 0 0 0 0 1 0 1 1 1 0 0 1 1 1 0 0 1 0 1 1 1 1]]
+
+--- TRIAL 2 ---
+NONCE:        [[1 0 0 0 0 0 0 1 0 1 1 0 1 0 0 0 1 1 0 1 1 1 1 1 1 1 1 1 1 0 0 1]]
+CIPHER RAW:   [[-0.6905549   0.7026423  -0.70445484  0.8767664  -0.2548411   0.7967046
+  -0.11300244  0.7670947   0.7172782  -0.85522515  0.68668187  0.9284891
+   0.39670718 -0.77502435  0.77426535  0.55987316 -0.27936557 -0.74080604
+  -0.53661615  0.90267366  0.1679682   0.78600955 -0.8327321  -0.6291373
+   0.79746735 -0.58596724  0.55512846  0.73424053  0.40017626  0.57273024
+   0.60901695 -0.7099422 ]]
+CIPHER SIGN:  [[0 1 0 1 0 1 0 1 1 0 1 1 1 0 1 1 0 0 0 1 1 1 0 0 1 0 1 1 1 1 1 0]]
+BOB OUT:      [[1 0 0 0 1 1 1 1 1 0 0 0 0 1 0 0 1 1 1 0 1 1 1 1 0 0 1 0 1 0 0 0]]
+EVE OUT:      [[0 1 0 0 0 1 1 1 1 1 0 0 0 0 1 0 1 1 1 0 0 1 1 1 0 0 1 0 0 1 1 1]]
+
+--- TRIAL 3 ---
+NONCE:        [[1 1 1 0 1 1 0 1 1 1 0 0 1 0 1 0 1 0 0 0 1 0 1 0 1 0 1 1 1 1 0 1]]
+CIPHER RAW:   [[-0.703279    0.7344592  -0.72614235  0.87983775 -0.26177844  0.8101628
+  -0.05535734  0.783726    0.7135691  -0.85233706  0.675572    0.92568475
+   0.38455263 -0.77705467  0.76144445  0.5461901  -0.2797424  -0.7617955
+  -0.55768955  0.90662885  0.19375657  0.7892684  -0.843063   -0.6845346
+   0.8070708  -0.6079946   0.57721376  0.7423165   0.39658195  0.60589284
+   0.61263525 -0.7024993 ]]
+CIPHER SIGN:  [[0 1 0 1 0 1 0 1 1 0 1 1 1 0 1 1 0 0 0 1 1 1 0 0 1 0 1 1 1 1 1 0]]
+BOB OUT:      [[1 0 0 0 1 1 1 1 1 0 0 0 0 1 0 0 1 1 1 0 1 0 1 1 0 0 1 0 1 0 0 0]]
+EVE OUT:      [[0 1 0 0 0 1 1 1 1 0 0 0 0 0 1 0 1 1 1 0 0 1 1 1 0 0 1 0 0 1 1 1]]
+
+=== MULTI-SEED SUMMARY ===
+bob_final_acc: 0.899170 ± 0.006516
+eve_final_acc: 0.665405 ± 0.008263
+bob_wrong_key_final_acc: 0.584229 ± 0.013164
+bob_wrong_nonce_final_acc: 0.563892 ± 0.010792
+naive_cipher_final_acc: 0.500952 ± 0.005547
+bob_final_hard_err: 3.226562 ± 0.208507
+eve_final_hard_err: 10.707031 ± 0.264416
+fresh_eve_mean_acc: 0.675170 ± 0.013833
+fresh_eve_std_acc: 0.029128 ± 0.005650
+fresh_eve_best_acc: 0.726587 ± 0.011342
+fresh_eve_mean_hard_err: 10.394570 ± 0.442649
+fresh_eve_std_hard_err: 0.932106 ± 0.180790
+fresh_eve_best_hard_err: 8.749219 ± 0.362936
+bob_frozen_eval_acc: 0.901880 ± 0.006770
+bob_frozen_eval_hard_err: 3.139844 ± 0.216639
+bob_frozen_eval_wrong_key_acc: 0.588306 ± 0.020411
+bob_frozen_eval_wrong_nonce_acc: 0.557642 ± 0.010952
+
+=== PER-SEED RESULTS ===
+seed=11 | Bob=0.8920 | Eve=0.6577 | WrongKey=0.5801 | WrongNonce=0.5587 | Naive=0.5098 | FreshMean=0.6572 | FreshBest=0.7286
+seed=22 | Bob=0.8915 | Eve=0.6581 | WrongKey=0.5999 | WrongNonce=0.5842 | Naive=0.4948 | FreshMean=0.6913 | FreshBest=0.7161
+seed=33 | Bob=0.9067 | Eve=0.6798 | WrongKey=0.5824 | WrongNonce=0.5538 | Naive=0.5046 | FreshMean=0.6911 | FreshBest=0.7410
+seed=44 | Bob=0.8999 | Eve=0.6625 | WrongKey=0.5627 | WrongNonce=0.5576 | Naive=0.4963 | FreshMean=0.6652 | FreshBest=0.7113
+seed=55 | Bob=0.9058 | Eve=0.6689 | WrongKey=0.5961 | WrongNonce=0.5651 | Naive=0.4993 | FreshMean=0.6711 | FreshBest=0.7360
+
+=== DISTRIBUTION SUMMARY ===
+
+[bob_final_acc]
+mean:   0.899170
+std:    0.006516
+min:    0.891479
+q25:    0.891968
+median: 0.899902
+q75:    0.905762
+max:    0.906738
+
+[eve_final_acc]
+mean:   0.665405
+std:    0.008263
+min:    0.657715
+q25:    0.658081
+median: 0.662476
+q75:    0.668945
+max:    0.679810
+
+[bob_wrong_key_final_acc]
+mean:   0.584229
+std:    0.013164
+min:    0.562744
+q25:    0.580078
+median: 0.582397
+q75:    0.596069
+max:    0.599854
+
+[bob_wrong_nonce_final_acc]
+mean:   0.563892
+std:    0.010792
+min:    0.553833
+q25:    0.557617
+median: 0.558716
+q75:    0.565063
+max:    0.584229
+
+[naive_cipher_final_acc]
+mean:   0.500952
+std:    0.005547
+min:    0.494751
+q25:    0.496338
+median: 0.499268
+q75:    0.504639
+max:    0.509766
+
+[bob_final_hard_err]
+mean:   3.226562
+std:    0.208507
+min:    2.984375
+q25:    3.015625
+median: 3.203125
+q75:    3.457031
+max:    3.472656
+
+[eve_final_hard_err]
+mean:   10.707031
+std:    0.264416
+min:    10.246094
+q25:    10.593750
+median: 10.800781
+q75:    10.941406
+max:    10.953125
+
+[fresh_eve_mean_acc]
+mean:   0.675170
+std:    0.013833
+min:    0.657153
+q25:    0.665173
+median: 0.671075
+q75:    0.691113
+max:    0.691333
+
+[fresh_eve_std_acc]
+mean:   0.029128
+std:    0.005650
+min:    0.019939
+q25:    0.028308
+median: 0.029118
+q75:    0.030653
+max:    0.037623
+
+[fresh_eve_best_acc]
+mean:   0.726587
+std:    0.011342
+min:    0.711304
+q25:    0.716064
+median: 0.728638
+q75:    0.735962
+max:    0.740967
+
+[fresh_eve_mean_hard_err]
+mean:   10.394570
+std:    0.442649
+min:    9.877344
+q25:    9.884375
+median: 10.525586
+q75:    10.714453
+max:    10.971094
+
+[fresh_eve_std_hard_err]
+mean:   0.932106
+std:    0.180790
+min:    0.638062
+q25:    0.905848
+median: 0.931787
+q75:    0.980897
+max:    1.203938
+
+[fresh_eve_best_hard_err]
+mean:   8.749219
+std:    0.362936
+min:    8.289062
+q25:    8.449219
+median: 8.683594
+q75:    9.085938
+max:    9.238281
+
+[bob_frozen_eval_acc]
+mean:   0.901880
+std:    0.006770
+min:    0.894165
+q25:    0.895752
+median: 0.900024
+q75:    0.908081
+max:    0.911377
+
+[bob_frozen_eval_hard_err]
+mean:   3.139844
+std:    0.216639
+min:    2.835938
+q25:    2.941406
+median: 3.199219
+q75:    3.335938
+max:    3.386719
+
+[bob_frozen_eval_wrong_key_acc]
+mean:   0.588306
+std:    0.020411
+min:    0.554932
+q25:    0.582153
+median: 0.590454
+q75:    0.596313
+max:    0.617676
+
+[bob_frozen_eval_wrong_nonce_acc]
+mean:   0.557642
+std:    0.010952
+min:    0.538696
+q25:    0.553955
+median: 0.560669
+q75:    0.563843
+max:    0.571045
