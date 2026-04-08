@@ -47,7 +47,8 @@ import matplotlib.pyplot as plt
 # KONFIG
 # ============================================================
 
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+#DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cpu"
 
 MSG_BITS = 32       # az üzenet hosszúsága
 KEY_BITS = 32       # a kulcs hosszúsága
@@ -1116,8 +1117,8 @@ if __name__ == "__main__":
     print("Device:", DEVICE)
 
     #SEEDS = [11, 22]
-    SEEDS = [11, 22, 33, 44, 55]
-    '''
+    #SEEDS = [11, 22, 33, 44, 55]
+
     SEEDS = [
         11, 22, 33, 44, 55,
         66, 77, 88, 99, 111,
@@ -1125,7 +1126,7 @@ if __name__ == "__main__":
         177, 188, 199, 211, 222,
         233, 244, 255, 266, 277
     ]
-    '''
+
 
     all_results = []
     last_run = None
